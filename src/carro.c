@@ -11,8 +11,8 @@ int posx=0, posy=50, posz=-80; //Variáveis que definem a posição da câmera
 int oy=0,ox=0,oz=0;         //Variáveis que definem para onde a câmera olha
 int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
 
-float limiteEsq=-15, limiteDir=15;
-float car=-45,rua=0;
+float limiteEsq=-30, limiteDir=30;
+float car=0,rua=-50;
 //Protótipos das Funções
 void Inicializa();
 void Display();
@@ -24,7 +24,7 @@ void TeclasEspeciais (int key, int x, int y);
 void ruaReta()
 { 
 	glPushMatrix();
-	glTranslatef(0,.2,rua--);
+	glTranslatef(0,.2,-50);
 	glColor3ub(50,50,50); //rua
 	glBegin(GL_QUADS);
 	glVertex3f(limiteEsq, .2, 0);
@@ -45,10 +45,10 @@ void ruaCurva()
 	glTranslatef(0,.2,rua--);
 	glColor3ub(50,50,50);
 	glBegin(GL_QUADS);
-	glVertex3f(limiteEsq-i, .2, i);
-	glVertex3f(limiteDir-i, .2, i);
-	glVertex3f(limiteDir-i, .2, i+1);
-	glVertex3f(limiteEsq-i, .2, i+1);
+	glVertex3f(limiteEsq-(i*.2), .2, i);
+	glVertex3f(limiteDir-(i*.2), .2, i);
+	glVertex3f(limiteDir-(i*.2), .2, i+5);
+	glVertex3f(limiteEsq-(i*.2), .2, i+5);
 	glEnd();
         glPopMatrix();
    }
@@ -105,12 +105,12 @@ void Display()
 // treixo de rua reta
 
 	ruaReta();
-	//ruaCurva();
+//ruaCurva();
 
 
 
     glColor3ub(217,217,25); // rua marcas
-	for( z=5000; z>-10; z=z-10)
+	for( z=500; z>-10; z=z-10)
 	{
 		glPushMatrix();
 		glTranslatef(0,.3,rua);
@@ -125,6 +125,8 @@ void Display()
 		glPopMatrix();
 		
 	}
+		rua--;
+		if(rua<-100)rua=-50;
 
     /*  glColor3ub(56,176,222); //piscina legal
 	glBegin(GL_QUADS);
@@ -244,24 +246,24 @@ void Display()
 	
 	glPushMatrix();
         glColor3ub(23,234,23); //carro
-        glTranslatef(car,3,-30);
+        glTranslatef(car,3,-10);
         glScalef(8, 3, 6);
         glutSolidCube(1);
 	glPopMatrix();
 
-	glPushMatrix(); //roda 1
-	glColor3ub(0,0,0);
-	glTranslatef(car-3,2,-34);
-	glScalef(3, 3, 8);
-        glutSolidCylinder(.5,1,50,50);	
-        glPopMatrix();
+	//glPushMatrix(); //roda 1
+	//glColor3ub(0,0,0);
+	//glTranslatef(car-3,2,-34);
+	//glScalef(3, 3, 8);
+        //glutSolidCylinder(.5,1,50,50);	
+        //glPopMatrix();
 
-	glPushMatrix(); //roda 2
-	glColor3ub(0,0,0);
-	glTranslatef(car+3,2,-34);
-	glScalef(3, 3, 8);
-        glutSolidCylinder(.5,1,50,50);	
-        glPopMatrix();
+	//glPushMatrix(); //roda 2
+	//glColor3ub(0,0,0);
+	//glTranslatef(car+3,2,-34);
+	//glScalef(3, 3, 8);
+        //glutSolidCylinder(.5,1,50,50);	
+        //glPopMatrix();
 	
 	//glPushMatrix();
         //glColor3ub(220,220,220); //cubo
@@ -270,31 +272,29 @@ void Display()
         //glutSolidCube(1);
 	//glPopMatrix();
 
-	glPushMatrix();
-        glColor3ub(200,5,70); //carro 2
-        glTranslatef(10,3,-30);
-        glScalef(8, 3, 6);
-        glutSolidCube(1);
-	glPopMatrix();
+	//glPushMatrix();
+        //glColor3ub(200,5,70); //carro 2
+        //glTranslatef(10,3,-30);
+        //glScalef(6, 3, 8);
+        //glutSolidCube(1);
+	//glPopMatrix();
 
-	glPushMatrix(); //roda 1
-	glColor3ub(0,0,0);
-	glTranslatef(7,2,-34);
-	glScalef(3, 3, 8);
-        glutSolidCylinder(.5,1,50,50);	
-        glPopMatrix();
+	//glPushMatrix(); //roda 1
+	//glColor3ub(0,0,0);
+	//glTranslatef(10,2,-30);
+	//glScalef(8, 3, 3);
+        //glutSolidCylinder(.5,1,50,50);	
+        //glPopMatrix();
 
-	glPushMatrix(); //roda 2
-	glColor3ub(0,0,0);
-	glTranslatef(13,2,-34);
-	glScalef(3, 3, 8);
-        glutSolidCylinder(.5,1,50,50);	
-        glPopMatrix();
+	//glPushMatrix(); //roda 2
+	//glColor3ub(0,0,0);
+	//glTranslatef(10,2,-35);
+	//glScalef(8, 3, 3);
+        //glutSolidCylinder(.5,1,50,50);	
+        //glPopMatrix();
 
-	if(car >= 1)
-		{}//puts("bateu");
-	else
-		car+=.4;
+	if(car > limiteDir || car < limiteEsq)
+		puts("bateu");
       
     
          // glPopMatrix();  //Retorna ao estado anterior da cena. O que for desenhado após o Push não influenciou o já representado
@@ -379,7 +379,8 @@ void TeclasEspeciais (int key, int x, int y)
  //x, y - recebem respectivamente as posições mouse na tela (permite tratar os dois dispositivos)
       if (key==GLUT_KEY_RIGHT)
       {
-	 ox+=3;
+	car-=5;
+	 //ox+=3;
          //posx+=5; ox+=5;
       }
       else if (key==GLUT_KEY_PAGE_UP)
@@ -395,7 +396,7 @@ void TeclasEspeciais (int key, int x, int y)
       }
       else if (key==GLUT_KEY_LEFT)    
       { 
-	 ox-=3;
+	 car+=5;
          //posx-=5; ox-=5;
       }
       else if (key==GLUT_KEY_PAGE_DOWN)
