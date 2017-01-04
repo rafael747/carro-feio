@@ -11,8 +11,9 @@ int posx=0, posy=50, posz=-80; //Variáveis que definem a posição da câmera
 int oy=0,ox=0,oz=0;         //Variáveis que definem para onde a câmera olha
 int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
 
+int xcarro1=0,xcarro2=25,xcarro3=-5;
 float limiteEsq=-30, limiteDir=30;
-float car=0,rua=-50;
+float car=0,rua=-50,passo=0.01,cerca=0,carro1=80,carro2=100,carro3=-25;
 //Protótipos das Funções
 void Inicializa();
 void Display();
@@ -24,11 +25,11 @@ void TeclasEspeciais (int key, int x, int y);
 void ruaReta()
 { 
 	glPushMatrix();
-	glTranslatef(0,.2,-50);
+	glTranslatef(0,.2,0);
 	glColor3ub(50,50,50); //rua
 	glBegin(GL_QUADS);
-	glVertex3f(limiteEsq, .2, 0);
-	glVertex3f(limiteDir, .2, 0);
+	glVertex3f(limiteEsq, .2, -50);
+	glVertex3f(limiteDir, .2, -50);
 	glVertex3f(limiteDir, .2, 500);
 	glVertex3f(limiteEsq, .2, 500);
 	glEnd();
@@ -76,7 +77,7 @@ void Display()
    //if (projecao==1)
    //   glOrtho(-150, 150, -150, 150, -150, 150); //Define a projeção como ortogonal
    //else
-      gluPerspective(45,1,1,1000); //Define a projeção como perspectiva
+      gluPerspective(45,1,1,500); //Define a projeção como perspectiva
    
    glMatrixMode(GL_MODELVIEW);/*glMatrixMode()- define qual matriz será alterada. SEMPRE defina a câmera 
                               (Ortogonal ou Perspectiva) na matriz MODELVIEW (onde o desenho ocorrerá).*/
@@ -110,7 +111,7 @@ void Display()
 
 
     glColor3ub(217,217,25); // rua marcas
-	for( z=500; z>-10; z=z-10)
+	for( z=550; z>-50; z=z-15)
 	{
 		glPushMatrix();
 		glTranslatef(0,.3,rua);
@@ -124,9 +125,12 @@ void Display()
         	
 		glPopMatrix();
 		
-	}
-		rua--;
-		if(rua<-100)rua=-50;
+	}	
+		if(passo < 1)
+			passo+=.000005;
+
+		rua-=passo;
+		if(rua<-100)rua=-10;
 
     /*  glColor3ub(56,176,222); //piscina legal
 	glBegin(GL_QUADS);
@@ -140,8 +144,12 @@ void Display()
 // cerca dahora
 
      	glColor3ub(235,199,158); // cerca
-	for( z=-50; z<200; z=z+3)
+	for( z=150; z<800; z=z+3)
 	{
+		
+		glPushMatrix();
+		glTranslatef(0,0,cerca);
+		
 		glBegin(GL_QUADS);
 		glVertex3f(-35, 0, z);
 		glVertex3f(-35, 6, z);
@@ -149,15 +157,21 @@ void Display()
 		glVertex3f(-35, 0, z+2);
 		glEnd();
 		
+		glPopMatrix();
+		
+		glPushMatrix();
+		glTranslatef(0,0,cerca);
 		glBegin(GL_QUADS); //divisoria
 		glVertex3f(-35, 3, z+2);
 		glVertex3f(-35, 4, z+2);
 		glVertex3f(-35, 4, z+3);
 		glVertex3f(-35, 3, z+3);
 		glEnd();
+		glPopMatrix();
 		
 	}
-
+	cerca-=passo;
+	if(cerca < -1000) cerca=400;
 
 /*      glColor3ub(216,216,191); //fundacao casa cinza
 	glBegin(GL_QUADS);
@@ -251,7 +265,51 @@ void Display()
         glutSolidCube(1);
 	glPopMatrix();
 
-	//glPushMatrix(); //roda 1
+	glPushMatrix();
+        glColor3ub(232,23,56); //carro2
+        glTranslatef(xcarro1,3,carro1);
+        glScalef(8, 3, 6);
+        glutSolidCube(1);
+	glPopMatrix();
+
+	carro1-=passo-0.01*(rand()%20);
+	if(carro1<-100)
+	{
+		carro1=600;
+		srand(time(NULL));
+		xcarro1=(rand()%(int)(limiteDir-limiteEsq)+limiteEsq);
+	}
+
+	glPushMatrix();
+        glColor3ub(100,50,100); //carro3
+        glTranslatef(xcarro2,3,carro2);
+        glScalef(8, 3, 6);
+        glutSolidCube(1);
+	glPopMatrix();
+
+	carro2-=passo-0.001*(rand()%20);
+	if(carro2<-500)
+	{
+		carro2=800;
+		srand(time(NULL));
+		xcarro2=(rand()%(int)(limiteDir-limiteEsq)+limiteEsq);
+	}
+
+	glPushMatrix();
+        glColor3ub(25,25,90); //carro4
+        glTranslatef(xcarro3,3,carro3);
+        glScalef(8, 3, 6);
+        glutSolidCube(1);
+	glPopMatrix();
+
+	carro3-=0.3*passo-0.005*(rand()%20);
+	if(carro3<-500)
+	{
+		carro3=500;
+		srand(time(NULL));
+		xcarro3=(rand()%(int)(limiteDir-limiteEsq)+limiteEsq);
+	}
+//glPushMatrix(); //roda 1
 	//glColor3ub(0,0,0);
 	//glTranslatef(car-3,2,-34);
 	//glScalef(3, 3, 8);
@@ -295,8 +353,8 @@ void Display()
 
 	if(car > limiteDir || car < limiteEsq)
 		puts("bateu");
-      
-    
+        
+
          // glPopMatrix();  //Retorna ao estado anterior da cena. O que for desenhado após o Push não influenciou o já representado
    //----------------------------------------------------------------   
    
