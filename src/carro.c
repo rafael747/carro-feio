@@ -13,7 +13,7 @@ int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na verti
 
 int xcarro1=0,xcarro2=25,xcarro3=-5;
 float limiteEsq=-30, limiteDir=30;
-float car=0,rua=-50,passo=0.01,cerca=0,carro1=80,carro2=100,carro3=-25;
+float car=0,rua=-50,passo=1,cerca=0,carro1=80,carro2=100,carro3=-25;
 //Protótipos das Funções
 void Inicializa();
 void Display();
@@ -126,8 +126,8 @@ void Display()
 		glPopMatrix();
 		
 	}	
-		if(passo < 1)
-			passo+=.000005;
+		if(passo < 50)
+			passo+=.001;
 
 		rua-=passo;
 		if(rua<-100)rua=-10;
