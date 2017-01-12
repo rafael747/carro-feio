@@ -15,16 +15,16 @@ int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na verti
 
 //TODO:	as posições de camera precisam ser ajustadas ainda
 
-int xcarro=0, xcarro1=10, xcarro2=25, xcarro3=-5,xcerca=-35; //posicoes inicias dos elementos em X
+int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-35; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
-float faixa=-50,cerca=0,carro=-10,carro1=80,carro2=100,carro3=25; //posição inicial dos elementos em Z
+float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25; //posição inicial dos elementos em Z
 
 int limiteEsq=-30, limiteDir=30;	//define os limites e o centro da pista em X
 float centro;
 
-float passo=0.001;		//distancia percorrida em cada tick (velocidade inicial do jogo)
-float incremento=0.0001;	//valor incrementado em passo a cada tick
-float limite=2;			//limite de velocidade para o jogo
+float passo=0.1;		//distancia percorrida em cada tick (velocidade inicial do jogo)
+float incremento=0.01;	//valor incrementado em passo a cada tick
+float limite=4;			//limite de velocidade para o jogo
 
 //observei q depende do processamento da maquina
 //EX: no meu pc com VGA os "ticks" são bem mais rapidos, eu tenho q colocar valores menores 
@@ -47,10 +47,10 @@ void ruaReta() //Função para desenhar a rua (constante, nao se mexe)
 	glTranslatef(0,.2,0);
 	glColor3ub(50,50,50); //rua
 	glBegin(GL_QUADS);
-	glVertex3f(limiteEsq, .2, -50);
-	glVertex3f(limiteDir, .2, -50);
-	glVertex3f(limiteDir, .2, 500);
-	glVertex3f(limiteEsq, .2, 500);
+	glVertex3f(limiteEsq, 0, -50);
+	glVertex3f(limiteDir, 0, -50);
+	glVertex3f(limiteDir, 0, 500);
+	glVertex3f(limiteEsq, 0, 500);
 	glEnd();
         glPopMatrix();
 }
@@ -202,7 +202,7 @@ void Display()
 //TODO: o resto do carro
 
 
-///////////////// CARRO 1 ////////////////////////
+///////////////// CARRO 1 //////////////////////// VERMELHO
 
 	glPushMatrix();
         glColor3ub(232,23,56); //carro1
@@ -217,16 +217,45 @@ void Display()
 	if(carro1<-100) //passou de -100 em Z
 	{
 		carro1=600; //vai para 600 em Z
+		
 		srand(time(NULL)); //e sorteia uma posicao nova em X
-		xcarro1=(rand()%(limiteDir-limiteEsq-10)+limiteEsq); //sorteia uma posicao no meio dos limites
+		xcarro1=(rand()%(limiteDir-limiteEsq-15)+limiteEsq); //sorteia uma posicao no meio dos limites
 		//o "-10" é para trazer mais para o meio da pista
+
+		if(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50) //ta no range do carro2
+		{	if(xcarro1-20 < limiteEsq)
+				xcarro1+=15;
+			else
+				xcarro1-=15;
+			puts("carro vermelho muda - roxo");
+		}
+		
+		if(xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50) //ta no range do carro3
+		{	if(xcarro1-20 < limiteEsq)
+				xcarro1+=15;
+			else
+				xcarro1-=15;
+			puts("carro vermelho muda - azul");
+		}
+			 
 
 		//TODO: fazer com q um carro nao apareca no mesmo X de outro carro
 		//TODO: sortear uma nova cor para o carro
 		//TODO: fazer o resto do carro tbm
 	}
 
-//////////////// CARRO 2 ////////////////////
+	/////// Colisao carro 1
+
+	if(carro1 < carro+8 && carro1 > carro-8)
+	{
+		if(xcarro1 < xcarro+10 && xcarro1 > xcarro-10)
+		{
+			puts("Bateu - vermelho");
+		}
+	}
+
+
+//////////////// CARRO 2 //////////////////// ROXO
 
 	glPushMatrix();
         glColor3ub(100,50,100); //carro2
@@ -242,10 +271,39 @@ void Display()
 	{
 		carro2=800;
 		srand(time(NULL));
-		xcarro2=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq); //sorteia posicao em X
+		xcarro2=(rand()%(int)(limiteDir-limiteEsq-15)+limiteEsq); //sorteia posicao em X
 		
+		if(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50) //ta no range do carro1
+		{	if(xcarro2-20 < limiteEsq)
+				xcarro2+=15;
+			else
+				xcarro2-=15;
+			puts("carro roxo muda - vermelho");
+		}
+		
+		if(xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50) //ta no range do carro3
+		{	if(xcarro2-20 < limiteEsq)
+				xcarro2+=15;
+			else
+				xcarro2-=15;
+			puts("carro roxo muda - azul");
+		}
+		
+
+
 		//TODO: modelar o resto do carro (fazer um carro diferente do outro)
 	}
+
+	/////// Colisao carro 2
+
+	if(carro2 < carro+8 && carro2 > carro-8)
+	{
+		if(xcarro2 < xcarro+10 && xcarro2 > xcarro-10)
+		{
+			puts("Bateu - roxo");
+		}
+	}
+
 
 //////////////// CARRO 3 /////////////////////
 
@@ -263,7 +321,36 @@ void Display()
 	{
 		carro3=500;
 		srand(time(NULL));
-		xcarro3=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq); //nova pos em X
+		xcarro3=(rand()%(int)(limiteDir-limiteEsq-15)+limiteEsq); //nova pos em X
+
+
+		if(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50) //ta no range do carro1
+		{	if(xcarro3-20 < limiteEsq)
+				xcarro3+=15;
+			else
+				xcarro3-=15;
+			puts("carro azul muda - vermelho");
+		}
+		
+		if(xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50) //ta no range do carro2
+		{	if(xcarro3-20 < limiteEsq)
+				xcarro3+=15;
+			else
+				xcarro3-=15;
+			puts("carro azul muda - roxo");
+		}
+	
+
+	}
+
+	/////// Colisao carro 3
+
+	if(carro3 < carro+8 && carro3 > carro-8)
+	{
+		if(xcarro3 < xcarro+10 && xcarro3 > xcarro-10)
+		{
+			puts("Bateu - azul");
+		}
 	}
 
 
@@ -299,7 +386,6 @@ void Mouse(int botao, int estado, int x, int y)
       {
 	      
       
-      printf("pos:  x: %d  y: %d  z: %d\nolho:  x: %d  y: %d  z: %d\n",posx,posy,posz,ox,oy,oz);
 
 		      
       projecao=1; //TA CAGADO
@@ -353,7 +439,6 @@ void keyboard (unsigned char key, int x, int y)
       {         
          exit(0);
       }
-      printf("pos:  x: %d  y: %d  z: %d\nolho:  x: %d  y: %d  z: %d\n",posx,posy,posz,ox,oy,oz);
       glutPostRedisplay();
 }
 void TeclasEspeciais (int key, int x, int y)
@@ -398,7 +483,6 @@ void TeclasEspeciais (int key, int x, int y)
          //posz+=5; oz+=5;
       }
       
-      printf("pos:  x: %d  y: %d  z: %d\nolho:  x: %d  y: %d  z: %d\n",posx,posy,posz,ox,oy,oz);
       
       glutPostRedisplay();
 }
