@@ -10,21 +10,21 @@ int projecao=0;	//Variável Lógica para Definir o Tipo de Projeção (Perspectiva o
 //TODO: vai ser necessario imprementar a visao ortogonal
 
 int posx=0, posy=50, posz=-80; //Variáveis que definem a posição da câmera
-int oy=0,ox=0,oz=20;         //Variáveis que definem para onde a câmera olha
+int oy=0,ox=0,oz=50;         //Variáveis que definem para onde a câmera olha
 int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
 
 //TODO:	as posições de camera precisam ser ajustadas ainda
 
-int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-35; //posicoes inicias dos elementos em X
+int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
 float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25; //posição inicial dos elementos em Z
 
-int limiteEsq=-30, limiteDir=30;	//define os limites e o centro da pista em X
+int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
 
-float passo=0.1;		//distancia percorrida em cada tick (velocidade inicial do jogo)
+float passo=0.5;		//distancia percorrida em cada tick (velocidade inicial do jogo)
 float incremento=0.01;	//valor incrementado em passo a cada tick
-float limite=4;			//limite de velocidade para o jogo
+float limite=20;			//limite de velocidade para o jogo
 
 //observei q depende do processamento da maquina
 //EX: no meu pc com VGA os "ticks" são bem mais rapidos, eu tenho q colocar valores menores 
@@ -184,7 +184,13 @@ void Display()
 	//deslocamento da cerca
 	cerca-=passo;
 	//reset da posicao da cerca
-	if(cerca < -1000) cerca=400;
+	if(cerca < -1000) 
+	{	cerca=400;
+		if(rand()%2 )
+			xcerca=-40;
+		else
+			xcerca=40;
+	}
 
 //TODO: criar uma funcao e escolher posicoes aleatorias para colocar a cerca (lado direito ou esquerdo da pista)
 
@@ -219,25 +225,32 @@ void Display()
 		carro1=600; //vai para 600 em Z
 		
 		srand(time(NULL)); //e sorteia uma posicao nova em X
-		xcarro1=(rand()%(limiteDir-limiteEsq-15)+limiteEsq); //sorteia uma posicao no meio dos limites
+		xcarro1=(rand()%(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia uma posicao no meio dos limites
 		//o "-10" é para trazer mais para o meio da pista
 
-		if(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50) //ta no range do carro2
-		{	if(xcarro1-20 < limiteEsq)
-				xcarro1+=15;
-			else
-				xcarro1-=15;
-			puts("carro vermelho muda - roxo");
+		while(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50 || xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50)
+		{	
+			xcarro1+=10;
+			if(xcarro1 > limiteDir-10)
+				xcarro1=limiteEsq+10;
+			puts("vermelho muda");
 		}
+
+		//if(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50) //ta no range do carro2
+		//{	if(xcarro1-20 < limiteEsq)
+		//		xcarro1+=15;
+		//	else
+		//		xcarro1-=15;
+		//	puts("carro vermelho muda - roxo");
+		//}
 		
-		if(xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50) //ta no range do carro3
-		{	if(xcarro1-20 < limiteEsq)
-				xcarro1+=15;
-			else
-				xcarro1-=15;
-			puts("carro vermelho muda - azul");
-		}
-			 
+		//if(xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50) //ta no range do carro3
+		//{	if(xcarro1-20 < limiteEsq)
+		//		xcarro1+=15;
+		//	else
+		//		xcarro1-=15;
+		//	puts("carro vermelho muda - azul");
+		//}	 
 
 		//TODO: fazer com q um carro nao apareca no mesmo X de outro carro
 		//TODO: sortear uma nova cor para o carro
@@ -271,23 +284,32 @@ void Display()
 	{
 		carro2=800;
 		srand(time(NULL));
-		xcarro2=(rand()%(int)(limiteDir-limiteEsq-15)+limiteEsq); //sorteia posicao em X
+		xcarro2=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia posicao em X
 		
-		if(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50) //ta no range do carro1
-		{	if(xcarro2-20 < limiteEsq)
-				xcarro2+=15;
-			else
-				xcarro2-=15;
-			puts("carro roxo muda - vermelho");
-		}
-		
-		if(xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50) //ta no range do carro3
-		{	if(xcarro2-20 < limiteEsq)
-				xcarro2+=15;
-			else
-				xcarro2-=15;
-			puts("carro roxo muda - azul");
-		}
+
+ 		while(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50 || xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50)
+                {
+                        xcarro2-=10; 
+                        if(xcarro2 < limiteEsq+10)
+                                xcarro2=limiteDir-10;
+                        puts("roxo muda");
+                }
+
+	//	if(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50) //ta no range do carro1
+	//	{	if(xcarro2-20 < limiteEsq)
+	//			xcarro2+=15;
+	//		else
+	//			xcarro2-=15;
+	//		puts("carro roxo muda - vermelho");
+	//	}
+	//	
+	//	if(xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50) //ta no range do carro3
+	//	{	if(xcarro2-20 < limiteEsq)
+	//			xcarro2+=15;
+	//		else
+	//			xcarro2-=15;
+	//		puts("carro roxo muda - azul");
+	//	}
 		
 
 
@@ -321,24 +343,32 @@ void Display()
 	{
 		carro3=500;
 		srand(time(NULL));
-		xcarro3=(rand()%(int)(limiteDir-limiteEsq-15)+limiteEsq); //nova pos em X
+		xcarro3=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq+10); //nova pos em X
 
 
-		if(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50) //ta no range do carro1
-		{	if(xcarro3-20 < limiteEsq)
-				xcarro3+=15;
-			else
-				xcarro3-=15;
-			puts("carro azul muda - vermelho");
-		}
-		
-		if(xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50) //ta no range do carro2
-		{	if(xcarro3-20 < limiteEsq)
-				xcarro3+=15;
-			else
-				xcarro3-=15;
-			puts("carro azul muda - roxo");
-		}
+		 while(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50 || xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50)
+                {
+                        xcarro3-=10; 
+                        if(xcarro3 < limiteEsq+10)
+                                xcarro3=15;
+                        puts("azul muda");
+                }
+
+	//	if(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50) //ta no range do carro1
+	//	{	if(xcarro3-20 < limiteEsq)
+	//			xcarro3+=15;
+	//		else
+	//			xcarro3-=15;
+	//		puts("carro azul muda - vermelho");
+	//	}
+	//	
+	//	if(xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50) //ta no range do carro2
+	//	{	if(xcarro3-20 < limiteEsq)
+	//			xcarro3+=15;
+	//		else
+	//			xcarro3-=15;
+	//		puts("carro azul muda - roxo");
+	//	}
 	
 
 	}
@@ -385,10 +415,12 @@ void Mouse(int botao, int estado, int x, int y)
       if (estado == GLUT_DOWN)
       {
 	      
-      
+      posx=0;posy=50;posz=-80;
+      oy=0;ox=0;oz=50;	
+      lx=0; ly=1;  lz=0;
 
 		      
-      projecao=1; //TA CAGADO
+      //projecao=1; //TA CAGADO
       //posx=0; posy=10; posz=20;
       //ox=0,oy=0,oz=0;
       //lx=0, ly=1,lz=0;
@@ -399,7 +431,13 @@ void Mouse(int botao, int estado, int x, int y)
       case GLUT_RIGHT_BUTTON:
       if(estado == GLUT_DOWN)
       {
-         projecao=0;
+
+	posx=0;posy=250;posz=60;
+     	oy=0;ox=0;oz=80;
+	lx=0; ly=0;  lz=1;
+
+
+        // projecao=0;
         // posx=0; posy=10; posz=20;
          //oy=0; ox=0;  oz=0;
         // lx=0, ly=1, lz=0;
@@ -459,7 +497,8 @@ void TeclasEspeciais (int key, int x, int y)
       else if (key==GLUT_KEY_UP)
       {
 	//TODO: limitar o quanto o carro pode ir para a frente
-	carro+=5;
+	if(carro < 180)
+		carro+=5;
 	 //oz+=3;
 	 //oy+=3;
          //posz-=5; oz-=5;
@@ -477,6 +516,7 @@ void TeclasEspeciais (int key, int x, int y)
       else if (key==GLUT_KEY_DOWN)
       {    
 	//TODO: limitar o quanto o carro pode ir para tras
+	if(carro > -10)
 	carro-=5;
 	 //oz-=3;
 	 //oy-=3;  
