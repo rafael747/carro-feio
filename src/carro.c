@@ -4,20 +4,21 @@
 #include <GL/gl.h>
 #include <stdio.h>
 #include <GL/freeglut.h>
+#include <time.h>
 
-//Declaração de Variáveis Globais
-int projecao=0;	//Variável Lógica para Definir o Tipo de Projeção (Perspectiva ou Ortogonal)
+//Declaraï¿½ï¿½o de Variï¿½veis Globais
+int projecao=0;	//Variï¿½vel Lï¿½gica para Definir o Tipo de Projeï¿½ï¿½o (Perspectiva ou Ortogonal)
 //TODO: vai ser necessario imprementar a visao ortogonal
 
-int posx=0, posy=50, posz=-80; //Variáveis que definem a posição da câmera
-int oy=0,ox=0,oz=50;         //Variáveis que definem para onde a câmera olha
-int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
+int posx=0, posy=50, posz=-80; //Variï¿½veis que definem a posiï¿½ï¿½o da cï¿½mera
+int oy=0,ox=0,oz=50;         //Variï¿½veis que definem para onde a cï¿½mera olha
+int lx=0, ly=1,  lz=0;         //Variï¿½veis que definem qual eixo estarï¿½ na vertical do monitor.
 
-//TODO:	as posições de camera precisam ser ajustadas ainda
+//TODO:	as posiï¿½ï¿½es de camera precisam ser ajustadas ainda
 
-int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
+int xcarro=0, xcarro1=28, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
-float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25; //posição inicial dos elementos em Z
+float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25; //posiï¿½ï¿½o inicial dos elementos em Z
 
 int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
@@ -26,23 +27,32 @@ float passo=0.5;		//distancia percorrida em cada tick (velocidade inicial do jog
 float incremento=0.01;	//valor incrementado em passo a cada tick
 float limite=20;			//limite de velocidade para o jogo
 
+int gameOver = 0;				//variavel do fim do jogo
+
+float threshold[3] = {0.01, 0.001, 0.005};				//limiar de velocidade
+
+float faixaOver=-50, cercaOver=0, carroOver=-10, passoOver=0.5, incrementoOver=0.01; //variaveis de fim do jogo
+
+void initRand(){
+		srand(time(NULL));			//inicia a seed de aleatoriedade
+}
+
+int r1=123, g1=73, b1=30;
+int r2=200, g2=121, b2=56;   //para aleatoriedade de cores
+int r3=90, g3=133, b3=213;
 //observei q depende do processamento da maquina
-//EX: no meu pc com VGA os "ticks" são bem mais rapidos, eu tenho q colocar valores menores 
+//EX: no meu pc com VGA os "ticks" sï¿½o bem mais rapidos, eu tenho q colocar valores menores
 
 
-//Protótipos das Funções
+//Protï¿½tipos das Funï¿½ï¿½es
 void Inicializa();
 void Display();
 void Mouse(int botao, int estado, int x, int y);
 void keyboard (unsigned char key, int x, int y);
 void TeclasEspeciais (int key, int x, int y);
 
+void ruaReta() {
 
-
-
-
-void ruaReta() //Função para desenhar a rua (constante, nao se mexe)
-{ 
 	glPushMatrix();
 	glTranslatef(0,.2,0);
 	glColor3ub(50,50,50); //rua
@@ -55,76 +65,314 @@ void ruaReta() //Função para desenhar a rua (constante, nao se mexe)
         glPopMatrix();
 }
 
+void carroBuilder(int xcarro, int carro, int r, int g, int b) {
+
+	if(!r && !b && !g) {
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255, 108, 0);
+		glBegin(GL_POLYGON);
+		glVertex3f(-2, 0, -2);
+		glVertex3f(-2, 2, -2);
+		glVertex3f(-2, 2, 0);
+		glVertex3f(-2, 4, 2);						//lado esquerdo lider
+		glVertex3f(-2, 4, 4);
+		glVertex3f(-2, 2, 6);
+		glVertex3f(-2, 2, 8);
+		glVertex3f(-2, 0, 8);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255, 108, 0);
+		glBegin(GL_POLYGON);
+		glVertex3f(2, 0, -2);
+		glVertex3f(2, 2, -2);
+		glVertex3f(2, 2, 0);
+		glVertex3f(2, 4, 2);						//lado direito lider
+		glVertex3f(2, 4, 4);
+		glVertex3f(2, 2, 6);
+		glVertex3f(2, 2, 8);
+		glVertex3f(2, 0, 8);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,4,2);
+		glVertex3f(2,4,2);            	//capo lider
+		glVertex3f(2, 4,4);
+		glVertex3f(-2, 4,4);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,8);
+		glVertex3f(2, 2,8);
+		glVertex3f(2, 0,8);
+		glVertex3f(-2,0,8);               //parachouqe traseiro lider
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,0);
+		glVertex3f(2,2,0);                //parabrisa lider
+		glVertex3f(2,4,2);
+		glVertex3f(-2,4,2);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,4,4);
+		glVertex3f(2,4,4);                //parabrisa traseiro lider
+		glVertex3f(2, 2,6);
+		glVertex3f(-2,2,6);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,-2);
+		glVertex3f(2,2,-2);                //parachoque dianteiro lider
+		glVertex3f(2, 0,-2);
+		glVertex3f(-2, 0,-2);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,-2);							//motor lider
+		glVertex3f(2,2,-2);
+		glVertex3f(2, 2, 0);
+		glVertex3f(-2, 2, 0);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(255,108,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,6);							//porta malas lider
+		glVertex3f(2,2,6);
+		glVertex3f(2,2,8);
+		glVertex3f(-2,2,8);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(0,0,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-1,4.2,2);
+		glVertex3f(1,4.2,2);            	//faixa capo lider
+		glVertex3f(1,4.2,4);
+		glVertex3f(-1,4.2,4);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(0,0,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-1,2.2,-2);
+		glVertex3f(1,2.2,-2);            	//faixa motor lider
+		glVertex3f(1,2.2,0);
+		glVertex3f(-1,2.2,0);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(0,0,0);
+		glBegin(GL_QUADS);
+		glVertex3f(-1,2.2,6);
+		glVertex3f(1,2.2,6);            	//faixa porta malas lider
+		glVertex3f(1,2.2,8);
+		glVertex3f(-1,2.2,8);
+		glEnd();
+		glPopMatrix();
+	} else {
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_POLYGON);
+		glVertex3f(-2, 0, -2);
+		glVertex3f(-2, 2, -2);
+		glVertex3f(-2, 2, 0);
+		glVertex3f(-2, 4, 2);						//lado esquerdo
+		glVertex3f(-2, 4, 4);
+		glVertex3f(-2, 2, 6);
+		glVertex3f(-2, 2, 8);
+		glVertex3f(-2, 0, 8);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_POLYGON);
+		glVertex3f(2, 0, -2);
+		glVertex3f(2, 2, -2);
+		glVertex3f(2, 2, 0);
+		glVertex3f(2, 4, 2);						//lado direito
+		glVertex3f(2, 4, 4);
+		glVertex3f(2, 2, 6);
+		glVertex3f(2, 2, 8);
+		glVertex3f(2, 0, 8);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,4,2);
+		glVertex3f(2,4,2);            	//capo
+		glVertex3f(2, 4,4);
+		glVertex3f(-2, 4,4);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,8);
+		glVertex3f(2, 2,8);
+		glVertex3f(2, 0,8);
+		glVertex3f(-2,0,8);               //parachouqe traseiro
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,0);
+		glVertex3f(2,2,0);                //parabrisa
+		glVertex3f(2,4,2);
+		glVertex3f(-2,4,2);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,4,4);
+		glVertex3f(2,4,4);                //parabrisa traseiro
+		glVertex3f(2, 2,6);
+		glVertex3f(-2,2,6);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,-2);
+		glVertex3f(2,2,-2);                //parachoque dianteiro
+		glVertex3f(2, 0,-2);
+		glVertex3f(-2, 0,-2);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,-2);							//motor
+		glVertex3f(2,2,-2);
+		glVertex3f(2, 2, 0);
+		glVertex3f(-2, 2, 0);
+		glEnd();
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,3,carro);
+		glScalef(2, 2, -2);
+		glColor3ub(r, g, b);
+		glBegin(GL_QUADS);
+		glVertex3f(-2,2,6);							//porta malas
+		glVertex3f(2,2,6);
+		glVertex3f(2,2,8);
+		glVertex3f(-2,2,8);
+		glEnd();
+		glPopMatrix();
+	}
+
+}
+
 //outros metodos
+void cercaBuilder(int z) {
 
+	glColor3ub(235,199,158); // cerca
+	for( z=150; z<800; z=z+3)
+	{
+		glPushMatrix();
+		glTranslatef(0,0,cerca);
 
-void Display()
-{
-   
-   // Inicializa parâmetros de rendering
-    // Define a cor de fundo da janela de visualização como azul (ceu)
-   glClearColor(0.2, 0.2, 0.5, 0.0);
+		glBegin(GL_QUADS);
+		glVertex3f(xcerca, 0, z);
+		glVertex3f(xcerca, 6, z);
+		glVertex3f(xcerca, 6, z+2);
+		glVertex3f(xcerca, 0, z+2);
+		glEnd();
 
-   glEnable(GL_DEPTH_TEST);
-   glEnable(GL_LINE_SMOOTH);
-   glEnable(GL_POLYGON_SMOOTH);
+		glPopMatrix();
 
+		glPushMatrix();
+		glTranslatef(0,0,cerca);
+		glBegin(GL_QUADS); //divisoria
+		glVertex3f(xcerca, 3, z+2);
+		glVertex3f(xcerca, 4, z+2);
+		glVertex3f(xcerca, 4, z+3);
+		glVertex3f(xcerca, 3, z+3);
+		glEnd();
+		glPopMatrix();
 
-   glEnable(GL_SMOOTH);
-   glEnable(GL_BLEND);
+	}
+}
 
-   glMatrixMode(GL_PROJECTION);/*glMatrixMode()- define qual matriz será alterada. SEMPRE defina o tipo de apresentação 
-                              (Ortogonal ou Perspectiva) na matriz PROJECTION.*/
-   glLoadIdentity();//"Limpa" ou "transforma" a matriz em identidade, reduzindo possíveis erros.
-
-   if (projecao==1)
-	//glOrtho(-150, 150, -150, 150, -150, 150); //Define a projeção como ortogonal
-	glOrtho(-50,50,50,-50, -50, 50); //Define a projeção como ortogonal
-   else
-      gluPerspective(45,1,1,500); //Define a projeção como perspectiva
-   
-   glMatrixMode(GL_MODELVIEW);/*glMatrixMode()- define qual matriz será alterada. SEMPRE defina a câmera 
-                              (Ortogonal ou Perspectiva) na matriz MODELVIEW (onde o desenho ocorrerá).*/
-   glLoadIdentity(); ////"Limpa" ou "transforma" a matriz em identidade, reduzindo possíveis erros.
-
-   gluLookAt(posx,posy,posz,ox,oy,oz,lx,ly,lz); //Define a pos da câmera, para onde olha e qual eixo está na vertical.
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); /* "limpa" um buffer particular ou combinações de buffers, 
-                                                         onde buffer é uma área de armazenamento para informações da imagem. 
-                                                        Nesse caso, está "limpando os buffers para suportarem animações */
-   //Chamada para Função  ou funções para desenhar o objeto/cena...
-   //----------------------------------------------------------------
-   //glPushMatrix(); //Salva o estado atual da cena. O que for desenhado após o Push não influenciará o já representado
-
-	int x,y,z; //variaveis auxiliares
-
-	centro=(limiteDir+limiteEsq)/2; //Atualizacao do centro da pista (nao faz sentido sem curvas)
-
-//Incremento da velocidade do jogo
-//a cada execucao de Display() (tick) o valor de passo é incrementado até um certo limite	
-//os outros elementos tomam esse "passo" como metrica para seus movimentos
-
-	if(passo < limite) 	
-		passo+=incremento;
-
-
-
-//////////////// TERRENO VERDE /////////////////////////////
-
-	glColor3ub(70, 100, 40); //terreno verde
-	glBegin(GL_QUADS);
-	glVertex3f(-500, 0, -50);
-	glVertex3f(500, 0, -50);
-	glVertex3f(500, 0, 500);
-	glVertex3f(-500, 0, 500);
-	glEnd();
- 
-
-/////////////////// RUA ///////////////////////////////////////
-
-	// treixo de rua reta (sempre desenhada da mesma forma)
-	ruaReta();
-
-////////////////// FAIXAS DA RUA ///////////////////////////////
+void faixasBuilder(int z) {
 
 	glColor3ub(217,217,25); // faixas amarelas da rua (no centro da rua)
 	for( z=550; z>-50; z=z-15)
@@ -139,410 +387,426 @@ void Display()
 		glVertex3f(centro+1, 0.3, z-6);
 		glEnd();
 		glPopMatrix();
-	}	
+	}
+}
+
+void terrenoBuilder() {
+
+	glColor3ub(70, 100, 40); //terreno verde
+	glBegin(GL_QUADS);
+	glVertex3f(-500, 0, -50);
+	glVertex3f(500, 0, -50);
+	glVertex3f(500, 0, 500);
+	glVertex3f(-500, 0, 500);
+	glEnd();
+}
+
+void projecaoConfig() {
+
+	if (projecao==1)
+ //glOrtho(-150, 150, -150, 150, -150, 150); //Define a projeï¿½ï¿½o como ortogonal
+		 glOrtho(-50,50,50,-50, -50, 50); //Define a projeï¿½ï¿½o como ortogonal
+	else
+		 gluPerspective(45,1,1,500); //Define a projeï¿½ï¿½o como perspectiva
+}
+
+void Display() {
+
+   // Inicializa parï¿½metros de rendering
+    // Define a cor de fundo da janela de visualizaï¿½ï¿½o como azul (ceu)
+   glClearColor(0.2, 0.2, 0.5, 0.0);
+
+   glEnable(GL_DEPTH_TEST);
+   glEnable(GL_LINE_SMOOTH);
+   glEnable(GL_POLYGON_SMOOTH);
+
+   glEnable(GL_SMOOTH);
+   glEnable(GL_BLEND);
+
+   glMatrixMode(GL_PROJECTION);/*glMatrixMode()- define qual matriz serï¿½ alterada. SEMPRE defina o tipo de apresentaï¿½ï¿½o
+                              (Ortogonal ou Perspectiva) na matriz PROJECTION.*/
+   glLoadIdentity();//"Limpa" ou "transforma" a matriz em identidade, reduzindo possï¿½veis erros.
+
+   projecaoConfig();
+
+   glMatrixMode(GL_MODELVIEW);/*glMatrixMode()- define qual matriz serï¿½ alterada. SEMPRE defina a cï¿½mera
+                              (Ortogonal ou Perspectiva) na matriz MODELVIEW (onde o desenho ocorrerï¿½).*/
+   glLoadIdentity(); ////"Limpa" ou "transforma" a matriz em identidade, reduzindo possï¿½veis erros.
+
+   gluLookAt(posx,posy,posz,ox,oy,oz,lx,ly,lz); //Define a pos da cï¿½mera, para onde olha e qual eixo estï¿½ na vertical.
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); /* "limpa" um buffer particular ou combinaï¿½ï¿½es de buffers,
+                                                         onde buffer ï¿½ uma ï¿½rea de armazenamento para informaï¿½ï¿½es da imagem.
+                                                        Nesse caso, estï¿½ "limpando os buffers para suportarem animaï¿½ï¿½es */
+   //Chamada para Funï¿½ï¿½o  ou funï¿½ï¿½es para desenhar o objeto/cena...
+   //----------------------------------------------------------------
+   //glPushMatrix(); //Salva o estado atual da cena. O que for desenhado apï¿½s o Push nï¿½o influenciarï¿½ o jï¿½ representado
+
+	int x,y,z; //variaveis auxiliares
+
+	centro=(limiteDir+limiteEsq)/2; //Atualizacao do centro da pista (nao faz sentido sem curvas)
+
+//Incremento da velocidade do jogo
+//a cada execucao de Display() (tick) o valor de passo ï¿½ incrementado atï¿½ um certo limite
+//os outros elementos tomam esse "passo" como metrica para seus movimentos
+
+	if(passo < limite)
+		passo+=incremento;
+
+//////////////// TERRENO VERDE /////////////////////////////
+
+	terrenoBuilder();
+
+/////////////////// RUA ///////////////////////////////////////
+
+	// treixo de rua reta (sempre desenhada da mesma forma)
+	ruaReta();
+
+////////////////// FAIXAS DA RUA ///////////////////////////////
+
+	faixasBuilder(z);
 
 	//movimentacao da faixa
 	// a cada tick a faixa vai para -Z
 	faixa-=passo;
-	
+
 	// quando a faixa se desloca um certo valor para tras
-	// a variavel "faixa" é alterada e a faixa vai para frente novamente
-	// a faixa é o unico elemento que é maior que a pista e nunca mostra o seu fim
+	// a variavel "faixa" ï¿½ alterada e a faixa vai para frente novamente
+	// a faixa ï¿½ o unico elemento que ï¿½ maior que a pista e nunca mostra o seu fim
 	// a variavel "faixa" "reseta" rapidamente para dar a impressao de ser infinita
-	if(faixa<-100)faixa=-10;
-
-
+	if(faixa<-100)
+		faixa=-10;
 
 //////////////// CERCA DAHORA! ///////////////////////
 
-     	glColor3ub(235,199,158); // cerca
-	for( z=150; z<800; z=z+3)
-	{
-		glPushMatrix();
-		glTranslatef(0,0,cerca);
-		
-		glBegin(GL_QUADS);
-		glVertex3f(xcerca, 0, z);
-		glVertex3f(xcerca, 6, z);
-		glVertex3f(xcerca, 6, z+2);
-		glVertex3f(xcerca, 0, z+2);
-		glEnd();
-		
-		glPopMatrix();
-		
-		glPushMatrix();
-		glTranslatef(0,0,cerca);
-		glBegin(GL_QUADS); //divisoria
-		glVertex3f(xcerca, 3, z+2);
-		glVertex3f(xcerca, 4, z+2);
-		glVertex3f(xcerca, 4, z+3);
-		glVertex3f(xcerca, 3, z+3);
-		glEnd();
-		glPopMatrix();
-		
-	}
+	cercaBuilder(z);
 	//deslocamento da cerca
 	cerca-=passo;
 	//reset da posicao da cerca
-	if(cerca < -1000) 
-	{	cerca=400;
+	if(cerca < -1000) {
+
+		cerca=400;
+
 		if(rand()%2 )
 			xcerca=-40;
 		else
 			xcerca=40;
 	}
 
-//TODO: criar uma funcao e escolher posicoes aleatorias para colocar a cerca (lado direito ou esquerdo da pista)
+//////////////////// CARRO LIDER ////////////////////
 
+	carroBuilder(xcarro, carro, 0, 0, 0);
 
+//////////////////// CARRO 1 //////////////////////////
 
-//////////////////// CARRO (o meu) ////////////////////
-	
-	glPushMatrix();
-        glColor3ub(23,234,23); //carro
-        glTranslatef(xcarro,3,carro);
-        glScalef(8, 3, 6);
-        glutSolidCube(1);
-	glPopMatrix();
+	carroBuilder(xcarro1, carro1, r1, g1, b1);
 
-//TODO: o resto do carro
-
-
-///////////////// CARRO 1 //////////////////////// VERMELHO
-
-	glPushMatrix();
-        glColor3ub(232,23,56); //carro1
-        glTranslatef(xcarro1,3,carro1);
-        glScalef(8, 3, 6);
-        glutSolidCube(1);
-	glPopMatrix();
-
-	carro1-=0.9*passo-0.01*(rand()%20); //controle de velocidade do carro1
+	carro1-=0.9*passo-threshold[0]*(rand()%20); //controle de velocidade do carro1
 
 	//reset do carro1
-	if(carro1<-100) //passou de -100 em Z
-	{
-		carro1=600; //vai para 600 em Z
-		
-		srand(time(NULL)); //e sorteia uma posicao nova em X
-		xcarro1=(rand()%(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia uma posicao no meio dos limites
-		//o "-10" é para trazer mais para o meio da pista
+	if(carro1<-100) { //passou de -100 em Z
 
-		while(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50 || xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50)
-		{	
+		r1 = rand() % 256;
+		g1 = rand() % 256;
+		b1 = rand() % 256;
+
+		carro1=600; //vai para 600 em Z
+
+		 //e sorteia uma posicao nova em X
+		xcarro1=(rand()%(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia uma posicao no meio dos limites
+		//o "-10" ï¿½ para trazer mais para o meio da pista
+
+		while(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50 || xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50){
+
 			xcarro1+=10;
 			if(xcarro1 > limiteDir-10)
 				xcarro1=limiteEsq+10;
-			puts("vermelho muda");
+			puts("carro 1 muda");
 		}
 
-		//if(xcarro2 < xcarro1+10 && xcarro2 > xcarro1-10 && carro2 > 50) //ta no range do carro2
-		//{	if(xcarro1-20 < limiteEsq)
-		//		xcarro1+=15;
-		//	else
-		//		xcarro1-=15;
-		//	puts("carro vermelho muda - roxo");
-		//}
-		
-		//if(xcarro3 < xcarro1+10 && xcarro3 > xcarro1-10 && carro3 > 50) //ta no range do carro3
-		//{	if(xcarro1-20 < limiteEsq)
-		//		xcarro1+=15;
-		//	else
-		//		xcarro1-=15;
-		//	puts("carro vermelho muda - azul");
-		//}	 
-
-		//TODO: fazer com q um carro nao apareca no mesmo X de outro carro
-		//TODO: sortear uma nova cor para o carro
-		//TODO: fazer o resto do carro tbm
 	}
 
 	/////// Colisao carro 1
 
-	if(carro1 < carro+8 && carro1 > carro-8)
-	{
-		if(xcarro1 < xcarro+10 && xcarro1 > xcarro-10)
-		{
-			puts("Bateu - vermelho");
+	if(carro1 < carro+8 && carro1 > carro-8) {
+
+		if(xcarro1 < xcarro+10 && xcarro1 > xcarro-10) {
+
+			gameOver = 1;
+			passo=0;
+			incremento=0;
+			cerca=0;
+			faixa=0;
+			carro=0;
+			carro1=-99;											//zera tudo e joga os carros longe
+			carro2=-499;
+			carro3=-499;
+			threshold[0]=0;
+			threshold[1]=0;
+			threshold[2]=0;
 		}
 	}
 
+////////////////// CARRO 2 ///////////////////////////
 
-//////////////// CARRO 2 //////////////////// ROXO
+	carroBuilder(xcarro2, carro2, r2, g2, b2);
 
-	glPushMatrix();
-        glColor3ub(100,50,100); //carro2
-        glTranslatef(xcarro2,3,carro2);
-        glScalef(8, 3, 6);
-        glutSolidCube(1);
-	glPopMatrix();
+	carro2-=passo-threshold[1]*(rand()%20); //controle de velocidade do carro2
 
-	carro2-=passo-0.001*(rand()%20); //controle de velocidade do carro2
+	//reset do carro2 (o reset demora um pouco mais pq esse carro ï¿½ mais lerdo)
+	if(carro2<-500) {
 
-	//reset do carro2 (o reset demora um pouco mais pq esse carro é mais lerdo)
-	if(carro2<-500)
-	{
+		r2 = rand() % 256;
+		g2 = rand() % 256;
+		b2 = rand() % 256;
+
 		carro2=800;
-		srand(time(NULL));
-		xcarro2=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia posicao em X
-		
 
- 		while(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50 || xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50)
-                {
-                        xcarro2-=10; 
+		xcarro2=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq+10); //sorteia posicao em X
+
+
+ 		while(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50 || xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50) {
+
+                        xcarro2-=10;
                         if(xcarro2 < limiteEsq+10)
-                                xcarro2=limiteDir-10;
-                        puts("roxo muda");
+                        	xcarro2=limiteDir-10;
                 }
 
-	//	if(xcarro1 < xcarro2+10 && xcarro1 > xcarro2-10 && carro1 > 50) //ta no range do carro1
-	//	{	if(xcarro2-20 < limiteEsq)
-	//			xcarro2+=15;
-	//		else
-	//			xcarro2-=15;
-	//		puts("carro roxo muda - vermelho");
-	//	}
-	//	
-	//	if(xcarro3 < xcarro2+10 && xcarro3 > xcarro2-10 && carro3 > 50) //ta no range do carro3
-	//	{	if(xcarro2-20 < limiteEsq)
-	//			xcarro2+=15;
-	//		else
-	//			xcarro2-=15;
-	//		puts("carro roxo muda - azul");
-	//	}
-		
-
-
-		//TODO: modelar o resto do carro (fazer um carro diferente do outro)
 	}
 
 	/////// Colisao carro 2
 
-	if(carro2 < carro+8 && carro2 > carro-8)
-	{
-		if(xcarro2 < xcarro+10 && xcarro2 > xcarro-10)
-		{
-			puts("Bateu - roxo");
+	if(carro2 < carro+8 && carro2 > carro-8) {
+
+		if(xcarro2 < xcarro+10 && xcarro2 > xcarro-10) {
+
+			gameOver = 1;
+			passo=0;
+			incremento=0;
+			cerca=0;
+			faixa=0;
+			carro=0;								//zera tudo e joga os carros longe
+			carro1=-99;
+			carro2=-499;
+			carro3=-499;
+			threshold[0]=0;
+			threshold[1]=0;
+			threshold[2]=0;
 		}
 	}
 
+/////////////////////// CARRO 3 //////////////////////////
 
-//////////////// CARRO 3 /////////////////////
+	carroBuilder(xcarro3, carro3, r3, g3, b3);
 
-	glPushMatrix();
-        glColor3ub(25,25,90); //carro3
-        glTranslatef(xcarro3,3,carro3);
-        glScalef(8, 3, 6);
-        glutSolidCube(1);
-	glPopMatrix();
-
-	carro3-=0.3*passo-0.005*(rand()%20); //controle de velocidade do carro3
+	carro3-=0.3*passo-threshold[2]*(rand()%20); //controle de velocidade do carro3
 
 	//reset do carro3
-	if(carro3<-500)
-	{
+	if(carro3<-500) {
+
+		r3 = rand() % 256;
+		g3 = rand() % 256;
+		b3 = rand() % 256;
+
 		carro3=500;
-		srand(time(NULL));
+
 		xcarro3=(rand()%(int)(limiteDir-limiteEsq-10)+limiteEsq+10); //nova pos em X
 
 
-		 while(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50 || xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50)
-                {
-                        xcarro3-=10; 
-                        if(xcarro3 < limiteEsq+10)
-                                xcarro3=15;
-                        puts("azul muda");
-                }
-
-	//	if(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50) //ta no range do carro1
-	//	{	if(xcarro3-20 < limiteEsq)
-	//			xcarro3+=15;
-	//		else
-	//			xcarro3-=15;
-	//		puts("carro azul muda - vermelho");
-	//	}
-	//	
-	//	if(xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50) //ta no range do carro2
-	//	{	if(xcarro3-20 < limiteEsq)
-	//			xcarro3+=15;
-	//		else
-	//			xcarro3-=15;
-	//		puts("carro azul muda - roxo");
-	//	}
-	
+		 while(xcarro1 < xcarro3+10 && xcarro1 > xcarro3-10 && carro1 > 50 || xcarro2 < xcarro3+10 && xcarro2 > xcarro3-10 && carro2 > 50) {
+    							xcarro3-=10;
+      						if(xcarro3 < limiteEsq+10)
+                  	xcarro3=15;
+			}
 
 	}
 
 	/////// Colisao carro 3
 
-	if(carro3 < carro+8 && carro3 > carro-8)
-	{
-		if(xcarro3 < xcarro+10 && xcarro3 > xcarro-10)
-		{
-			puts("Bateu - azul");
+	if(carro3 < carro+8 && carro3 > carro-8) {
+
+		if(xcarro3 < xcarro+10 && xcarro3 > xcarro-10) {
+
+			gameOver = 1;
+			passo=0;
+			incremento=0;
+			cerca=0;
+			faixa=0;
+			carro=0;
+			carro1=-99;
+			carro2=-499;				//zera tudo e joga os carros longe
+			carro3=-499;
+			threshold[0]=0;
+			threshold[1]=0;
+			threshold[2]=0;
 		}
 	}
 
 
-////////////// Controle de colisoes ////////////////
+////////////// ColisÃµes laterais ////////////////
 
 	//verificar a colisao com as laterais
-	if(xcarro > limiteDir || xcarro < limiteEsq)
-		puts("bateu");
+	if(xcarro > limiteDir || xcarro < limiteEsq) {
 
-	//TODO: Verificar a colicao com outros carros
-	// isso pode ser feito dentro da funcao de cada carro (se tiver) 
-	// ou no espeço reservado para eles (logo depois dos "resets")
+			gameOver = 1;
+			passo=0;
+			incremento=0;
+			cerca=0;
+			faixa=0;
+			carro=0;
+			carro1=-99;
+			carro2=-499;				//zera tudo e joga os carros longe
+			carro3=-499;
+			threshold[0]=0;
+			threshold[1]=0;
+			threshold[2]=0;
+	}
 
-	//TODO: Implementar algo para quando ocorrer uma colisao (tela game over)
-   
-   
-   
+	glutSwapBuffers(); //Executa a Cena. SwapBuffers dï¿½ suporte para mais de um buffer, permitindo execuï¿½ï¿½o de animaï¿½ï¿½es sem cintilaï¿½ï¿½es.
 
-
-	glutSwapBuffers(); //Executa a Cena. SwapBuffers dá suporte para mais de um buffer, permitindo execução de animações sem cintilações. 
-
-        glutPostRedisplay();
+  glutPostRedisplay();
 }
 
-void Mouse(int botao, int estado, int x, int y)
-{  //botão - recebe o código do botão pressionado
-   //estado - recebe se está pressionado ou não
-   //x, y - recebem respectivamente as posições do mouse na tela
-   switch (botao)
-   {
-      case GLUT_LEFT_BUTTON:
-      if (estado == GLUT_DOWN)
-      {
-	      
-      posx=0;posy=50;posz=-80;
-      oy=0;ox=0;oz=50;	
-      lx=0; ly=1;  lz=0;
+void Mouse(int botao, int estado, int x, int y) {
+	//botï¿½o - recebe o cï¿½digo do botï¿½o pressionado
+   //estado - recebe se estï¿½ pressionado ou nï¿½o
+   //x, y - recebem respectivamente as posiï¿½ï¿½es do mouse na tela
+   switch (botao) {
 
-		      
-      //projecao=1; //TA CAGADO
-      //posx=0; posy=10; posz=20;
-      //ox=0,oy=0,oz=0;
-      //lx=0, ly=1,lz=0;
-      glutPostRedisplay();
-      }
+      case GLUT_LEFT_BUTTON:
+	      if (estado == GLUT_DOWN) {
+
+		      posx=0;posy=50;posz=-80;
+		      oy=0;ox=0;oz=50;
+		      lx=0; ly=1;  lz=0;
+
+
+		      //projecao=1; //TA CAGADO
+		      //posx=0; posy=10; posz=20;
+		      //ox=0,oy=0,oz=0;
+		      //lx=0, ly=1,lz=0;
+		      glutPostRedisplay();
+
+					if(gameOver) {
+
+						gameOver = 0;
+
+						passo=passoOver;
+						incremento=incrementoOver;
+						faixa=faixaOver;
+						cerca=cercaOver;
+						carro=carroOver;
+						xcarro=0;
+						threshold[0]=0.01;
+						threshold[1]=0.001;
+						threshold[2]=0.005;
+					}
+      	}
       break;
 
       case GLUT_RIGHT_BUTTON:
-      if(estado == GLUT_DOWN)
-      {
+	      if(estado == GLUT_DOWN) {
 
-	posx=0;posy=250;posz=60;
-     	oy=0;ox=0;oz=80;
-	lx=0; ly=0;  lz=1;
+					posx=0;
+					posy=250;
+					posz=60;
+					oy=0;
+					ox=0;
+					oz=80;
+					lx=0;
+					ly=0;
+					lz=1;
 
+	        glutPostRedisplay();
+	      }
 
-        // projecao=0;
-        // posx=0; posy=10; posz=20;
-         //oy=0; ox=0;  oz=0;
-        // lx=0, ly=1, lz=0;
-         glutPostRedisplay();
-      }
       break;
    }
 }
 
-void keyboard (unsigned char key, int x, int y)
-{//Key - recebe o código ASCII da tecla
- //x, y - recebem as posições do mouse na tela (permite tratar os dois dispositivos)
-      if (key=='a')
-      {
-	 posx-=3;ox-=3;
-         //lz=0; ly=1; ox+=5;
+void keyboard (unsigned char key, int x, int y) {
+	//Key - recebe o cï¿½digo ASCII da tecla
+ //x, y - recebem as posiï¿½ï¿½es do mouse na tela (permite tratar os dois dispositivos)
+      if (key=='a') {
+
+	 			posx-=3;
+				ox-=3;
       }
-      else if (key=='s')
-      {
-	 posz+=3;oz+=3;
-         //lz=0; ly=1; ox-=5;
+      else if (key=='s') {
+
+				posz+=3;
+				oz+=3;
       }
-      else if (key=='d')
-      {
-	 posx+=3;ox+=3;
-         //lz=0; ly=1; oy+=5;
+      else if (key=='d') {
+
+	 			posx+=3;
+				ox+=3;
       }
-      else if (key=='w')    
-      {
-	 posz-=3;oz-=3;
+      else if (key=='w') {
+
+	 			posz-=3;
+				oz-=3;
       }
-      else if (key==' ')
-      {
-	//TODO: solta nitro	  
+      else if (key==' ') {
+
+	//TODO: solta nitro
+
       }
-      else if (key==27)
-      {         
+      else if (key==27) {
+
          exit(0);
       }
+
       glutPostRedisplay();
 }
-void TeclasEspeciais (int key, int x, int y)
-{//Key - recebe o código ASCII da tecla
- //x, y - recebem respectivamente as posições mouse na tela (permite tratar os dois dispositivos)
-      if (key==GLUT_KEY_RIGHT)
-      {
-	xcarro-=5;
-	//TODO: limitar o quanto o carro pode ir para os lados
-	 //ox+=3;
-         //posx+=5; ox+=5;
+
+void TeclasEspeciais (int key, int x, int y) {
+		//Key - recebe o cï¿½digo ASCII da tecla
+		//x, y - recebem respectivamente as posiï¿½ï¿½es mouse na tela (permite tratar os dois dispositivos)
+      if (key==GLUT_KEY_RIGHT) {
+
+				xcarro-=5;
       }
-      else if (key==GLUT_KEY_PAGE_UP)
-      {
+      else if (key==GLUT_KEY_PAGE_UP) {
+
          posy+=3;
-         //posy+=5; oy+=5;
       }
-      else if (key==GLUT_KEY_UP)
-      {
-	//TODO: limitar o quanto o carro pode ir para a frente
-	if(carro < 180)
-		carro+=5;
-	 //oz+=3;
-	 //oy+=3;
-         //posz-=5; oz-=5;
+      else if (key==GLUT_KEY_UP) {
+
+				if(carro < 180)
+					carro+=5;
+	    }
+      else if (key==GLUT_KEY_LEFT) {
+
+	 			xcarro+=5;
       }
-      else if (key==GLUT_KEY_LEFT)    
-      { 
-	 xcarro+=5;
-         //posx-=5; ox-=5;
+      else if (key==GLUT_KEY_PAGE_DOWN) {
+
+	 			posy-=3;
       }
-      else if (key==GLUT_KEY_PAGE_DOWN)
-      {
-	 posy-=3;
-         //posy-=5; oy-=5;
-      }
-      else if (key==GLUT_KEY_DOWN)
-      {    
-	//TODO: limitar o quanto o carro pode ir para tras
-	if(carro > -10)
-	carro-=5;
-	 //oz-=3;
-	 //oy-=3;  
-         //posz+=5; oz+=5;
-      }
-      
-      
+      else if (key==GLUT_KEY_DOWN) {
+
+				if(carro > -10)
+					carro-=5;
+			}
+
       glutPostRedisplay();
 }
-int main(int argc,char **argv)
-{
+
+int main(int argc,char **argv) {
 
    glutInit(&argc, argv); // Initializes glut
-    
-   
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); /*Define as características do espaço vetorial. 
-                                                                           //  Nesse caso, permite animações (sem cintilações), cores compostas por Verm. Verde e Azul,
-                                                                           //  Buffer que permite trablhar com profundidade e elimina faces escondidas.*/           
-  
+
+
+	 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); /*Define as caracterï¿½sticas do espaï¿½o vetorial.
+                                                                           //  Nesse caso, permite animaï¿½ï¿½es (sem cintilaï¿½ï¿½es), cores compostas por Verm. Verde e Azul,
+                                                                           //  Buffer que permite trablhar com profundidade e elimina faces escondidas.*/
    glutInitWindowSize(1000, 1000);
    glutInitWindowPosition(400, 400);
-   glutCreateWindow("Estrutura para uma Aplicação 3D");
+   glutCreateWindow("Estrutura para uma Aplicacao 3D");
    glutDisplayFunc(Display);
    glutMouseFunc(Mouse);
    glutKeyboardFunc(keyboard);
    glutSpecialFunc(TeclasEspeciais);
    glutMainLoop();
-   return 0; 
+   return 0;
 }
