@@ -5,18 +5,18 @@
 #include <stdio.h>
 #include <GL/freeglut.h>
 
-//DeclaraÁ„o de Vari·veis Globais
-int ativo=1;	//Vari·vel LÛgica para indicar se o jogo esta ativo "1" ou parado "0"
+//Declara√ß√£o de Vari√°veis Globais
+int ativo=1;	//Vari√°vel L√≥gica para indicar se o jogo esta ativo "1" ou parado "0"
 
-int posx=0, posy=50, posz=-80; //Vari·veis que definem a posiÁ„o da c‚mera
-int oy=0,ox=0,oz=50;         //Vari·veis que definem para onde a c‚mera olha
-int lx=0, ly=1,  lz=0;         //Vari·veis que definem qual eixo estar· na vertical do monitor.
+int posx=0, posy=50, posz=-80; //Vari√°veis que definem a posi√ß√£o da c√¢mera
+int oy=0,ox=0,oz=50;         //Vari√°veis que definem para onde a c√¢mera olha
+int lx=0, ly=1,  lz=0;         //Vari√°veis que definem qual eixo estar√° na vertical do monitor.
 
 char buff[20];	//buffer que armazena o texto que vai no letreiro
 
 int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
-float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25,letreiro=50; //posiÁ„o inicial dos elementos em Z
+float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25,letreiro=50; //posi√ß√£o inicial dos elementos em Z
 
 int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
@@ -31,10 +31,10 @@ int r3=25, g3=25, b3=90; //cor inicial do carro3
 
 
 //observei q depende do processamento da maquina
-//EX: no meu pc com VGA os "ticks" s„o bem mais rapidos, eu tenho q colocar valores menores 
+//EX: no meu pc com VGA os "ticks" s√£o bem mais rapidos, eu tenho q colocar valores menores 
 
 
-//ProtÛtipos das FunÁıes
+//Prot√≥tipos das Fun√ß√µes
 void Inicializa();
 void Display();
 void Mouse(int botao, int estado, int x, int y);
@@ -68,7 +68,7 @@ void terrenoBuilder() {
 }
 
 
-void ruaBuilder() //FunÁ„o para desenhar a rua (constante, nao se mexe)
+void ruaBuilder() //Fun√ß√£o para desenhar a rua (constante, nao se mexe)
 { 
 	glPushMatrix();
 	glTranslatef(0,.2,0);
@@ -105,8 +105,8 @@ void faixasBuilder() //funcao para desenhar as faixas da rua
 	faixa-=passo;
 	
 	// quando a faixa se desloca um certo valor para tras
-	// a variavel "faixa" È alterada e a faixa vai para frente novamente
-	// a faixa È o unico elemento que È maior que a pista e nunca mostra o seu fim
+	// a variavel "faixa" √© alterada e a faixa vai para frente novamente
+	// a faixa √© o unico elemento que √© maior que a pista e nunca mostra o seu fim
 	// a variavel "faixa" "reseta" rapidamente para dar a impressao de ser infinita
 	if(faixa<-100)faixa=-10;
 
@@ -185,7 +185,7 @@ void letreiroBuilder() //funcao que desenha um letreiro com a pontuacao
 	}
 	else{
 		//TODO:algo para quando o jogo acaba
-		// pontuaÁ„o XX, precione "R" para recomeÁar
+		// pontua√ß√£o XX, precione "R" para recome√ßar
 	}
 	escreve(buff);
 	glPopMatrix();
@@ -196,7 +196,7 @@ void letreiroBuilder() //funcao que desenha um letreiro com a pontuacao
 }
 
 
-void carroBuilder(int xcarro, int carro, int r, int g, int b) //funÁ„o que desenha o carro
+void carroBuilder(int xcarro, int carro, int r, int g, int b) //fun√ß√£o que desenha o carro
 {
 	//TODO: melhorar esses carros
 	
@@ -528,7 +528,7 @@ void carControl() //funcao que controla os carro (cores, resets, etc)
 
 	// com as laterais
 	if(xcarro > limiteDir-5) { //colisao lateral direita
-		xcarro-=10; //da um espaÁo da lateral
+		xcarro-=10; //da um espa√ßo da lateral
 		fim();
 	}
 	else if(xcarro < limiteEsq+5) { //colisao lateral esquerda
@@ -550,7 +550,7 @@ int novaPosicao(){
 		//srand(time(NULL)); //e sorteia uma posicao nova em X
 		posicao=(rand()%(limiteDir-limiteEsq-10)+limiteEsq+10); 
 			//sorteia uma posicao no meio dos limites
-			//o "-10" e "+10" È para trazer mais para o meio da pista
+			//o "-10" e "+10" √© para trazer mais para o meio da pista
 
 		while( xcarro1 < posicao+10 && xcarro1 > posicao-10 && carro1 > 50 ||
 		       xcarro2 < posicao+10 && xcarro2 > posicao-10 && carro2 > 50 ||
@@ -571,10 +571,12 @@ void fim()
 	ativo=0;
 	passo=0;
 
-	carro1+=20;carro2+=20;carro3+=20; //joga os carros um pouco para frente
+	carro1=-100;
+	carro2=-500;
+	carro3=-500; //reseta os carros
 					//para evitar nova colisao ao reiniciar o jogo
 
-	//TODO: calcula pontuaÁ„o e manipula o placar
+	//TODO: calcula pontua√ß√£o e manipula o placar
 
 //TODO: Algo visual para indicar que o jogo parou
 
@@ -584,8 +586,8 @@ void fim()
 void Display()
 {
    
-   // Inicializa par‚metros de rendering
-    // Define a cor de fundo da janela de visualizaÁ„o como azul (ceu)
+   // Inicializa par√¢metros de rendering
+    // Define a cor de fundo da janela de visualiza√ß√£o como azul (ceu)
    glClearColor(0.2, 0.2, 0.5, 0.0);
 
    glEnable(GL_DEPTH_TEST);
@@ -594,26 +596,26 @@ void Display()
    glEnable(GL_SMOOTH);
    glEnable(GL_BLEND);
 
-   glMatrixMode(GL_PROJECTION);/*glMatrixMode()- define qual matriz ser· alterada. SEMPRE defina o tipo de apresentaÁ„o 
+   glMatrixMode(GL_PROJECTION);/*glMatrixMode()- define qual matriz ser√° alterada. SEMPRE defina o tipo de apresenta√ß√£o 
                               (Ortogonal ou Perspectiva) na matriz PROJECTION.*/
-   glLoadIdentity();//"Limpa" ou "transforma" a matriz em identidade, reduzindo possÌveis erros.
-   gluPerspective(45,1,1,800); //Define a projeÁ„o como perspectiva
-   glMatrixMode(GL_MODELVIEW);/*glMatrixMode()- define qual matriz ser· alterada. SEMPRE defina a c‚mera 
-                              (Ortogonal ou Perspectiva) na matriz MODELVIEW (onde o desenho ocorrer·).*/
-   glLoadIdentity(); ////"Limpa" ou "transforma" a matriz em identidade, reduzindo possÌveis erros.
+   glLoadIdentity();//"Limpa" ou "transforma" a matriz em identidade, reduzindo poss√≠veis erros.
+   gluPerspective(45,1,1,800); //Define a proje√ß√£o como perspectiva
+   glMatrixMode(GL_MODELVIEW);/*glMatrixMode()- define qual matriz ser√° alterada. SEMPRE defina a c√¢mera 
+                              (Ortogonal ou Perspectiva) na matriz MODELVIEW (onde o desenho ocorrer√°).*/
+   glLoadIdentity(); ////"Limpa" ou "transforma" a matriz em identidade, reduzindo poss√≠veis erros.
 
-   gluLookAt(posx,posy,posz,ox,oy,oz,lx,ly,lz); //Define a pos da c‚mera, para onde olha e qual eixo est· na vertical.
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); /* "limpa" um buffer particular ou combinaÁıes de buffers, 
-                                                         onde buffer È uma ·rea de armazenamento para informaÁıes da imagem. 
+   gluLookAt(posx,posy,posz,ox,oy,oz,lx,ly,lz); //Define a pos da c√¢mera, para onde olha e qual eixo est√° na vertical.
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); /* "limpa" um buffer particular ou combina√ß√µes de buffers, 
+                                                         onde buffer √© uma √°rea de armazenamento para informa√ß√µes da imagem. 
 
-                                                        Nesse caso, est· "limpando os buffers para suportarem animaÁıes */
+                                                        Nesse caso, est√° "limpando os buffers para suportarem anima√ß√µes */
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	centro=(limiteDir+limiteEsq)/2; //Atualizacao do centro da pista (nao faz sentido sem curvas)
 
 //Incremento da velocidade do jogo
-//a cada execucao de Display() (tick) o valor de passo È incrementado atÈ um certo limite	
+//a cada execucao de Display() (tick) o valor de passo √© incrementado at√© um certo limite	
 //os outros elementos tomam esse "passo" como metrica para seus movimentos
 
 	if(passo < limite && ativo) //verifica tambem se o jogo esta ativo 	
@@ -643,7 +645,7 @@ void Display()
 
 ////////// LETREIRO //////////////////////
 
-	//letreiro com a pontuaÁ„o
+	//letreiro com a pontua√ß√£o
 	letreiroBuilder();
 
 /////////// CARRO (o meu) ////////////////////
@@ -672,13 +674,13 @@ void Display()
 	carControl();
 
 
-	glutSwapBuffers(); //Executa a Cena. SwapBuffers d· suporte para mais de um buffer, permitindo execuÁ„o de animaÁıes sem cintilaÁıes. 
+	glutSwapBuffers(); //Executa a Cena. SwapBuffers d√° suporte para mais de um buffer, permitindo execu√ß√£o de anima√ß√µes sem cintila√ß√µes. 
         glutPostRedisplay();
 }
 
 void keyboard (unsigned char key, int x, int y)
-{//Key - recebe o cÛdigo ASCII da tecla
- //x, y - recebem as posiÁıes do mouse na tela (permite tratar os dois dispositivos)
+{//Key - recebe o c√≥digo ASCII da tecla
+ //x, y - recebem as posi√ß√µes do mouse na tela (permite tratar os dois dispositivos)
 	if (key=='\t')
 	{
 		if(ly==1 && posy==50) //se modo normal
@@ -723,8 +725,8 @@ void keyboard (unsigned char key, int x, int y)
 	glutPostRedisplay();
 }
 void TeclasEspeciais (int key, int x, int y)
-{//Key - recebe o cÛdigo ASCII da tecla
- //x, y - recebem respectivamente as posiÁıes mouse na tela (permite tratar os dois dispositivos)
+{//Key - recebe o c√≥digo ASCII da tecla
+ //x, y - recebem respectivamente as posi√ß√µes mouse na tela (permite tratar os dois dispositivos)
 	
 	if (key==GLUT_KEY_RIGHT && ativo)
 	{
@@ -747,7 +749,7 @@ void TeclasEspeciais (int key, int x, int y)
 			carro-=5;
 	}
 
-	if(!lz && posy != 50) //est· em primeira pessoa
+	if(!lz && posy != 50) //est√° em primeira pessoa
 	{
 		 posx=xcarro;posy=10;posz=carro;
                  //oy=10;ox=0;oz=800;
@@ -762,13 +764,13 @@ int main(int argc,char **argv)
    glutInit(&argc, argv); // Initializes glut
     
    
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); /*Define as caracterÌsticas do espaÁo vetorial. 
-                                                                           //  Nesse caso, permite animaÁıes (sem cintilaÁıes), cores compostas por Verm. Verde e Azul,
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); /*Define as caracter√≠sticas do espa√ßo vetorial. 
+                                                                           //  Nesse caso, permite anima√ß√µes (sem cintila√ß√µes), cores compostas por Verm. Verde e Azul,
                                                                            //  Buffer que permite trablhar com profundidade e elimina faces escondidas.*/           
   
    glutInitWindowSize(1000, 1000);
    glutInitWindowPosition(400, 400);
-   glutCreateWindow("Estrutura para uma AplicaÁ„o 3D");
+   glutCreateWindow("Estrutura para uma Aplica√ß√£o 3D");
    glutDisplayFunc(Display);
    //glutMouseFunc(Mouse);
    glutKeyboardFunc(keyboard);
