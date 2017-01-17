@@ -13,17 +13,19 @@ int oy=0,ox=0,oz=50;         //Variáveis que definem para onde a câmera olha
 int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
 
 char buff[20];	//buffer que armazena o texto que vai no letreiro
+float score=0; //pontuacao
 
 int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
-float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25,letreiro=50; //posição inicial dos elementos em Z
+float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25,letreiro=100; //posição inicial dos elementos em Z
 
 int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
 
 float passo=0;		//distancia percorrida em cada tick (velocidade inicial do jogo)
 float incremento=0.00001;	//valor incrementado em passo a cada tick
-float limite=1;			//limite de velocidade para o jogo
+//float incremento=0.0000001;	//valor incrementado em passo a cada tick
+float limite=5;			//limite de velocidade para o jogo
 
 int r1=232, g1=23, b1=56; //cor inicial do carro1
 int r2=100, g2=50, b2=100; //cor inicial do carro2
@@ -166,32 +168,48 @@ void letreiroBuilder() //funcao que desenha um letreiro com a pontuacao
 {
 	glPushMatrix();  //base do letreiro
         glColor3ub(200,190,185); 
-        glTranslatef(45,10,letreiro);
+        glTranslatef(35,40,letreiro);
         glScalef(20, 10, 5);
         glutSolidCube(1);
 	glPopMatrix();
+	
+	glPushMatrix();  //haste do letreiro
+        glColor3ub(200,190,185); 
+        glTranslatef(45,20,letreiro);
+        glScalef(2, 50, 3);
+        glutSolidCube(1);
+	glPopMatrix();
+
 
 	//TODO: fazer decentemente esse letreiro
-
+	//trocar as cores 
+	//fundo preto/cinza
+	//haste cinza
+	// escrito amarelho/laranja
+	
 	glPushMatrix();
 	glColor3f(0,0,0);
-	glTranslatef(45,10,letreiro-5);
-	glScalef(.02,.02,.02);
+	glTranslatef(40,38,letreiro-3);
+	glScalef(.04,.04,.04);
 	glRotatef(180,0,1,0);
 	glLineWidth(2);
 	
 	if(ativo){
-		sprintf(buff, "%f", passo);
+		sprintf(buff, "%.1f", score*100);
+		escreve(buff);
 	}
 	else{
 		//TODO:algo para quando o jogo acaba
 		// pontuação XX, precione "R" para recomeçar
+		glTranslatef(-50,0,0);
+		glScalef(.7,.7,.7); //TODO: outra frase
+		escreve("Se fudeu!");
 	}
-	escreve(buff);
 	glPopMatrix();
 
-	// TODO:movimentacao do letreiro
 	// reset do letreiro
+	letreiro-=passo;
+	if(letreiro < -100) letreiro=1000;
 
 }
 
@@ -571,10 +589,6 @@ void fim()
 	ativo=0;
 	passo=0;
 
-	carro1=-100;
-	carro2=-500;
-	carro3=-500; //reseta os carros
-					//para evitar nova colisao ao reiniciar o jogo
 
 	//TODO: calcula pontuação e manipula o placar
 
@@ -617,10 +631,12 @@ void Display()
 //Incremento da velocidade do jogo
 //a cada execucao de Display() (tick) o valor de passo é incrementado até um certo limite	
 //os outros elementos tomam esse "passo" como metrica para seus movimentos
-
-	if(passo < limite && ativo) //verifica tambem se o jogo esta ativo 	
-		passo+=incremento;
-
+	
+	if(ativo) { //verifica se o jogo esta ativo
+		score+=incremento; //pontuacao
+		if(passo < limite ) 
+			passo+=incremento;
+	}
 
 
 ///////////// TERRENO VERDE //////////////////////
@@ -711,7 +727,15 @@ void keyboard (unsigned char key, int x, int y)
 	}
 	else if (key=='r') // reset do game
 	{
-		ativo=1;
+		ativo=1;	//volta o estado para ativo
+
+		//reseta os carros
+		//para evitar nova colisao ao reiniciar o jogo
+		carro=-10;xcarro=0;
+		carro1=10;carro2=100;carro3=2;
+
+		//reset da pontuacao
+		score=0;
 	}	
 
 	else if (key==' ')
@@ -770,7 +794,7 @@ int main(int argc,char **argv)
   
    glutInitWindowSize(1000, 1000);
    glutInitWindowPosition(400, 400);
-   glutCreateWindow("Estrutura para uma Aplicação 3D");
+   glutCreateWindow("carro feio");
    glutDisplayFunc(Display);
    //glutMouseFunc(Mouse);
    glutKeyboardFunc(keyboard);
