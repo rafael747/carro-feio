@@ -371,6 +371,72 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(-1,2.2,8);
 		glEnd();
 		glPopMatrix();
+		
+            glPushMatrix();
+	    glTranslatef(5,1.5,2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+							  //rodas dianteiras
+	    glPushMatrix();
+	    glTranslatef(-3, 1.5, 2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(-5,1.5,2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(5, 1.5, -12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(5,1.5,-12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+							    //rodas traseiras
+	    glPushMatrix();
+	    glTranslatef(-3, 1.5, -12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(-5,1.5,-12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
 
 	}
 	else {	//se for outro carro
@@ -490,6 +556,73 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(-2,2,8);
 		glEnd();
 		glPopMatrix();
+		
+		glPushMatrix();
+	    glTranslatef(5,1.5,2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+							  //rodas dianteiras
+	    glPushMatrix();
+	    glTranslatef(-3, 1.5, 2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(-5,1.5,2);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(5, 1.5, -12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(5,1.5,-12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+							    //rodas traseiras
+	    glPushMatrix();
+	    glTranslatef(-3, 1.5, -12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,0,1);
+	    glRotatef(90,1,0,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+	    glPopMatrix();
+
+	    glPushMatrix();
+	    glTranslatef(-5,1.5,-12);
+	    glTranslatef(xcarro,3,carro);
+	    glRotatef(90,0,1,0);
+	    glScalef(2,2,-2);
+	    glColor3ub(0,0,0);
+	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+	    glPopMatrix();
+
 
 	}
 
