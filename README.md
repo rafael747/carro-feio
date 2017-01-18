@@ -1,7 +1,10 @@
 # carro-feio
 trabalho da materia de comp grafica
 
+Dependencias: freeglut3-dev
 
-TODO
-
-fazer o trabalho
+Como usar:
+      
+      cd src
+      make
+      ./carro
