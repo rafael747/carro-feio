@@ -8,24 +8,24 @@
 //Declaração de Variáveis Globais
 int ativo=1;	//Variável Lógica para indicar se o jogo esta ativo "1" ou parado "0"
 
-int posx=0, posy=50, posz=-80; //Variáveis que definem a posição da câmera
+int posx=0, posy=50, posz=-100; //Variáveis que definem a posição da câmera
 int oy=0,ox=0,oz=50;         //Variáveis que definem para onde a câmera olha
 int lx=0, ly=1,  lz=0;         //Variáveis que definem qual eixo estará na vertical do monitor.
 
 char buff[20];	//buffer que armazena o texto que vai no letreiro
-float score=0; //pontuacao
+double score=0; //pontuacao
 
 int xcarro=0, xcarro1=0, xcarro2=25, xcarro3=-15,xcerca=-40; //posicoes inicias dos elementos em X
 				//inicialmete, recebem uma constante, dps eh aleatorio
-float faixa=-50,cerca=0,carro=-10,carro1=10,carro2=100,carro3=25,letreiro=100; //posição inicial dos elementos em Z
+float faixa=-50,cerca=0,carro=-10,carro1=60,carro2=150,carro3=75,letreiro=100; //posição inicial dos elementos em Z
 
 int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
 
 float passo=0;		//distancia percorrida em cada tick (velocidade inicial do jogo)
-float incremento=0.00001;	//valor incrementado em passo a cada tick
+float incremento=0.0001;	//valor incrementado em passo a cada tick
 //float incremento=0.0000001;	//valor incrementado em passo a cada tick
-float limite=5;			//limite de velocidade para o jogo
+float limite=20;			//limite de velocidade para o jogo
 
 int r1=232, g1=23, b1=56; //cor inicial do carro1
 int r2=100, g2=50, b2=100; //cor inicial do carro2
@@ -62,8 +62,8 @@ void terrenoBuilder() {
 
         glColor3ub(70, 100, 40); //terreno verde
         glBegin(GL_QUADS);
-        glVertex3f(-500, 0, -50);
-        glVertex3f(500, 0, -50);
+        glVertex3f(-500, 0, -150);
+        glVertex3f(500, 0, -150);
         glVertex3f(500, 0, 800);
         glVertex3f(-500, 0, 800);
         glEnd();
@@ -76,8 +76,8 @@ void ruaBuilder() //Função para desenhar a rua (constante, nao se mexe)
 	glTranslatef(0,.2,0);
 	glColor3ub(50,50,50); //rua
 	glBegin(GL_QUADS);
-	glVertex3f(limiteEsq, 0, -50);
-	glVertex3f(limiteDir, 0, -50);
+	glVertex3f(limiteEsq, 0, -150);
+	glVertex3f(limiteDir, 0, -150);
 	glVertex3f(limiteDir, 0, 800);
 	glVertex3f(limiteEsq, 0, 800);
 	glEnd();
@@ -88,7 +88,7 @@ void faixasBuilder() //funcao para desenhar as faixas da rua
 {
 	int z; //variavel auxiliar
 	glColor3ub(217,217,25); // faixas amarelas da rua (no centro da rua)
-	for( z=850; z>-50; z=z-15)
+	for( z=850; z>-150; z=z-15)
 	{
 		glPushMatrix();
 		glTranslatef(0,.3,faixa); //vai transladando o valor de "faixa"
@@ -167,49 +167,54 @@ void escreve(char *string)
 void letreiroBuilder() //funcao que desenha um letreiro com a pontuacao
 {
 	glPushMatrix();  //base do letreiro
-        glColor3ub(200,190,185); 
+        glColor3ub(64,64,64); 
         glTranslatef(35,40,letreiro);
         glScalef(20, 10, 5);
         glutSolidCube(1);
 	glPopMatrix();
 	
 	glPushMatrix();  //haste do letreiro
-        glColor3ub(200,190,185); 
+        glColor3ub(128,128,128); 
         glTranslatef(45,20,letreiro);
         glScalef(2, 50, 3);
         glutSolidCube(1);
 	glPopMatrix();
 
 
-	//TODO: fazer decentemente esse letreiro
-	//trocar as cores 
-	//fundo preto/cinza
-	//haste cinza
-	// escrito amarelho/laranja
-	
 	glPushMatrix();
-	glColor3f(0,0,0);
+	glColor3f(200,50,0);
 	glTranslatef(40,38,letreiro-3);
 	glScalef(.04,.04,.04);
 	glRotatef(180,0,1,0);
 	glLineWidth(2);
 	
-	if(ativo){
-		sprintf(buff, "%.1f", score*100);
+	if(ativo){ //enquanto ativo, atualiza o score
+		sprintf(buff, "%.0f", score*1000);
 		escreve(buff);
+		glPopMatrix();
 	}
-	else{
-		//TODO:algo para quando o jogo acaba
-		// pontuação XX, precione "R" para recomeçar
-		glTranslatef(-50,0,0);
-		glScalef(.7,.7,.7); //TODO: outra frase
-		escreve("Se fudeu!");
+	else {
+		glTranslatef(-100,100,0);
+		glScalef(.5,.5,.5); //escreve o score 
+		escreve("Score: ");
+		escreve(buff);
+		glPopMatrix();
+			
+		glPushMatrix();		//e mensagem para resetar
+		glColor3f(200,50,0);
+		glTranslatef(44,38,letreiro-3);
+		glScalef(.02,.02,.02);
+		glRotatef(180,0,1,0);
+		glLineWidth(2);
+		escreve("Precione R");
+		glPopMatrix();
+
 	}
-	glPopMatrix();
 
 	// reset do letreiro
 	letreiro-=passo;
-	if(letreiro < -100) letreiro=1000;
+	if(letreiro < -400) letreiro=2000+passo*500;
+	//TODO: verificar essa conta
 
 }
 
@@ -276,10 +281,35 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glEnd();
 		glPopMatrix();
 		
+		glPushMatrix();	//farol 1
+		glTranslatef(xcarro,3,carro-0.1);
+		glScalef(2, 2, -2);
+		glColor3ub(200,20 ,10);
+		glBegin(GL_QUADS);
+		glVertex3f(-1.6,1.4,8);
+		glVertex3f(-0.8, 1.4,8);
+		glVertex3f(-0.8, 0.6,8);
+		glVertex3f(-1.6,0.6,8);   
+		glEnd();
+		glPopMatrix();
+		
+		glPushMatrix();	//farol 2
+		glTranslatef(xcarro,3,carro-0.1);
+		glScalef(2, 2, -2);
+		glColor3ub(200,20 ,10);
+		glBegin(GL_QUADS);
+		glVertex3f(1.6,1.4,8);
+		glVertex3f(0.8, 1.4,8);
+		glVertex3f(0.8, 0.6,8);
+		glVertex3f(1.6,0.6,8);   
+		glEnd();
+		glPopMatrix();
+
+		
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
 		glScalef(2, 2, -2);
-		glColor3ub(255,108,0);
+		glColor3ub(65,65,65);
 		glBegin(GL_QUADS);
 		glVertex3f(-2,2,0);
 		glVertex3f(2,2,0);          //parabrisa lider
@@ -287,7 +317,7 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(-2,4,2);
 		glEnd();
 		glPopMatrix();
-
+		
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
 		glScalef(2, 2, -2);
@@ -297,6 +327,20 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(2,4,4);                //parabrisa traseiro lider
 		glVertex3f(2, 2,6);
 		glVertex3f(-2,2,6);
+		glEnd();
+		glPopMatrix();
+
+
+		glPushMatrix();
+		glTranslatef(xcarro,4,carro-.01);
+		glScalef(2, 2, -2);
+		//glColor3ub(80,140,160);
+		glColor3ub(65,65,65);
+		glBegin(GL_QUADS);
+		glVertex3f(-1.5,3.5,4);
+		glVertex3f(1.5,3.5,4);      //parabrisa traseiro lider (centro)
+		glVertex3f(1.5, 2.5,6);
+		glVertex3f(-1.5,2.5,6);
 		glEnd();
 		glPopMatrix();
 
@@ -372,72 +416,91 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glEnd();
 		glPopMatrix();
 		
-            glPushMatrix();
-	    glTranslatef(5,1.5,2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-							  //rodas dianteiras
-	    glPushMatrix();
-	    glTranslatef(-3, 1.5, 2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(-5,1.5,2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
+		glPushMatrix();			//pneu dianteiro esquerdo
+		glTranslatef(4.5, 1.5, 2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glutSolidCylinder( 1, 1, 27, 27);
+		glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(5, 1.5, -12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
+		glPushMatrix();		//roda dianteira esquerda
+		glTranslatef(4.6,1.5,2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		//glScalef(2,2,-2);
+		glScalef(1,1,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//pneu dianteiro direito
+		glTranslatef(-2.5, 1.5, 2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(5,1.5,-12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-							    //rodas traseiras
-	    glPushMatrix();
-	    glTranslatef(-3, 1.5, -12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
+		glPushMatrix();		//roda dianteira direita
+		glTranslatef(-4.6,1.5,2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//pneu traseiro esquerdo
+		glTranslatef(4.5, 1.5, -12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//roda traseira esquerda
+		glTranslatef(4.6,1.5,-12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(-5,1.5,-12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-
+		glPushMatrix();		//pneu traseiro direito
+		glTranslatef(-2.5, 1.5, -12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//pneu traseiro direito
+		glTranslatef(-4.6,1.5,-12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
+		
 	}
 	else {	//se for outro carro
 
@@ -476,7 +539,7 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
 		glScalef(2, 2, -2);
-		glColor3ub(r, g, b);
+		glColor3ub(r-20, g-10, b);
 		glBegin(GL_QUADS);
 		glVertex3f(-2,4,2);
 		glVertex3f(2,4,2);            	//capo
@@ -497,10 +560,35 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glEnd();
 		glPopMatrix();
 
+		glPushMatrix();	//farol 1
+		glTranslatef(xcarro,3,carro-0.1);
+		glScalef(2, 2, -2);
+		glColor3ub(200,20 ,10);
+		glBegin(GL_QUADS);
+		glVertex3f(-1.6,1.4,8);
+		glVertex3f(-0.8, 1.4,8);
+		glVertex3f(-0.8, 0.6,8);
+		glVertex3f(-1.6,0.6,8);   
+		glEnd();
+		glPopMatrix();
+		
+		glPushMatrix();	//farol 2
+		glTranslatef(xcarro,3,carro-0.1);
+		glScalef(2, 2, -2);
+		glColor3ub(200,20 ,10);
+		glBegin(GL_QUADS);
+		glVertex3f(1.6,1.4,8);
+		glVertex3f(0.8, 1.4,8);
+		glVertex3f(0.8, 0.6,8);
+		glVertex3f(1.6,0.6,8);   
+		glEnd();
+		glPopMatrix();
+
+
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
 		glScalef(2, 2, -2);
-		glColor3ub(r, g, b);
+		glColor3ub(65, 65, 65);
 		glBegin(GL_QUADS);
 		glVertex3f(-2,2,0);
 		glVertex3f(2,2,0);                //parabrisa
@@ -520,6 +608,20 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(-2,2,6);
 		glEnd();
 		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(xcarro,4,carro-.01);
+		glScalef(2, 2, -2);
+		glColor3ub(65,65,65);
+		glBegin(GL_QUADS);
+		glVertex3f(-1.5,3.5,4);
+		glVertex3f(1.5,3.5,4);      //parabrisa traseiro (centro)
+		glVertex3f(1.5, 2.5,6);
+		glVertex3f(-1.5,2.5,6);
+		glEnd();
+		glPopMatrix();
+
+
 
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
@@ -548,7 +650,7 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glPushMatrix();
 		glTranslatef(xcarro,3,carro);
 		glScalef(2, 2, -2);
-		glColor3ub(r, g, b);
+		glColor3ub(r-20, g-10, b);
 		glBegin(GL_QUADS);
 		glVertex3f(-2,2,6);	//porta malas
 		glVertex3f(2,2,6);
@@ -556,73 +658,91 @@ void carroBuilder(int xcarro, int carro, int r, int g, int b) //função que des
 		glVertex3f(-2,2,8);
 		glEnd();
 		glPopMatrix();
+
+		glPushMatrix();			//pneu dianteiro esquerdo
+		glTranslatef(4.5, 1.5, 2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glutSolidCylinder( 1, 1, 27, 27);
+		glPopMatrix();
+
+		glPushMatrix();		//roda dianteira esquerda
+		glTranslatef(4.6,1.5,2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
 		
-		glPushMatrix();
-	    glTranslatef(5,1.5,2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-							  //rodas dianteiras
-	    glPushMatrix();
-	    glTranslatef(-3, 1.5, 2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
+		glPushMatrix();		//pneu dianteiro direito
+		glTranslatef(-2.5, 1.5, 2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(-5,1.5,2);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
+		glPushMatrix();		//roda dianteira direita
+		glTranslatef(-4.6,1.5,2);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//pneu traseiro esquerdo
+		glTranslatef(4.5, 1.5, -12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//roda traseira esquerda
+		glTranslatef(4.6,1.5,-12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
 
-	    glPushMatrix();
-	    glTranslatef(5, 1.5, -12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
-
-	    glPushMatrix();
-	    glTranslatef(5,1.5,-12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-							    //rodas traseiras
-	    glPushMatrix();
-	    glTranslatef(-3, 1.5, -12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,0,1);
-	    glRotatef(90,1,0,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
-	    glPopMatrix();
-
-	    glPushMatrix();
-	    glTranslatef(-5,1.5,-12);
-	    glTranslatef(xcarro,3,carro);
-	    glRotatef(90,0,1,0);
-	    glScalef(2,2,-2);
-	    glColor3ub(0,0,0);
-	    gluDisk(gluNewQuadric(), 0, 1, 27, 27);
-	    glPopMatrix();
-
+		glPushMatrix();		//pneu traseiro direito
+		glTranslatef(-2.5, 1.5, -12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,0,1);
+		glRotatef(90,1,0,0);
+		glScalef(2,2,-2);
+		glColor3ub(0,0,0);
+		glutSolidCylinder(1, 1, 27, 27);
+		//gluCylinder(gluNewQuadric(), 1, 1, 1, 27, 27);
+		glPopMatrix();
+		
+		glPushMatrix();		//pneu traseiro direito
+		glTranslatef(-4.6,1.5,-12);
+		glTranslatef(xcarro,3,carro);
+		glRotatef(90,0,1,0);
+		glScalef(1,1,-2);
+		//glScalef(2,2,-2);
+		glColor3ub(32,32,32);
+		gluDisk(gluNewQuadric(), 0, 1, 27, 27);
+		glPopMatrix();
+		
 
 	}
 
@@ -647,43 +767,43 @@ void carControl() //funcao que controla os carro (cores, resets, etc)
 
 	// Carro1
 	if(carro1 < -100) { //passou de -100 em Z
-		carro1=800; 		//vai para 600 em Z
 		novaCor(&r1, &g1, &b1); //ganha uma nova cor
 		xcarro1=novaPosicao();	//e uma nova posicao em X
+		carro1=800; 		//vai para 600 em Z
 	}
 
 	// Carro2
 	if(carro2 < -500) { //passou de -500 em Z
-		carro2=850;		//vai para 800 em Z
 		novaCor(&r2, &g2, &b2);	//cor nova
 		xcarro2=novaPosicao();	//posicao nova
+		carro2=850;		//vai para 800 em Z
 	}
 
 	//Carro3
 	if(carro3 < -500) { //passou de -500 em Z
-		carro3=800;		//vai para 500 em Z
 		novaCor(&r3, &g3, &b3);	//cor nova
 		xcarro3=novaPosicao();	//posicao nova
+		carro3=800;		//vai para 500 em Z
 	}
 
 	/////// Controle das colisoes
 
 	/// com os outros carros
 
-	if(carro1 < carro+8 && carro1 > carro-8 && xcarro1 < xcarro+10 && xcarro1 > xcarro-10)
+	if(carro1 < carro+20 && carro1 > carro-20 && xcarro1 < xcarro+9 && xcarro1 > xcarro-9)
 		fim(); //colisao com carro1
-	else if(carro2 < carro+8 && carro2 > carro-8 && xcarro2 < xcarro+10 && xcarro2 > xcarro-10)
+	else if(carro2 < carro+20 && carro2 > carro-20 && xcarro2 < xcarro+9 && xcarro2 > xcarro-9)
 		fim(); //colisao com carro2
-	else if(carro3 < carro+8 && carro3 > carro-8 && xcarro3 < xcarro+10 && xcarro3 > xcarro-10)
+	else if(carro3 < carro+20 && carro3 > carro-20 && xcarro3 < xcarro+9 && xcarro3 > xcarro-9)
 		fim(); //colisao com carro3
 
 	// com as laterais
 	if(xcarro > limiteDir-5) { //colisao lateral direita
-		xcarro-=10; //da um espaço da lateral
+		//xcarro-=10; //da um espaço da lateral
 		fim();
 	}
 	else if(xcarro < limiteEsq+5) { //colisao lateral esquerda
-		xcarro+=10;
+		//xcarro+=10;
                 fim();
 	}
 }
@@ -718,15 +838,18 @@ int novaPosicao(){
 
 void fim()
 {
+	if(ativo) { //para fazer essa operacao somente uma vez
+		//posiciona o letreiro e a camera
+		letreiro=carro+50;
+	
+		posx=55; posy=50; posz=carro-100;
+		oy=0;ox=0;oz=carro+50;
+		lx=0; ly=1;  lz=0;
+	}
+
 	//para o jogo
 	ativo=0;
 	passo=0;
-
-
-	//TODO: calcula pontuação e manipula o placar
-
-//TODO: Algo visual para indicar que o jogo parou
-
 
 }
 
@@ -853,26 +976,36 @@ void keyboard (unsigned char key, int x, int y)
 		else //se primeira pessoa
 		{	
 			//coloca visao normal
-			posx=0;posy=50;posz=-80;
+			posx=0;posy=50;posz=-100;
 			oy=0;ox=0;oz=50;
 			lx=0; ly=1;  lz=0;
 		}
 	}
 	else if (key=='r') // reset do game
 	{
+		
+		passo=0;	//reseta a velocidade
 		ativo=1;	//volta o estado para ativo
 
 		//reseta os carros
 		//para evitar nova colisao ao reiniciar o jogo
 		carro=-10;xcarro=0;
-		carro1=10;carro2=100;carro3=2;
+		carro1=60;carro2=200;carro3=-500;
 
 		//reset da pontuacao
 		score=0;
+		
+		//reset da camera
+		posx=0; posy=50; posz=-100;
+		oy=0;ox=0;oz=50;
+		lx=0; ly=1;  lz=0;
+
+
 	}	
 
 	else if (key==' ')
 	{
+		passo+=incremento*10000;
 	//TODO: solta nitro	  
 	}
 	else if (key==27)
