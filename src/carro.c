@@ -206,7 +206,7 @@ void letreiroBuilder() //funcao que desenha um letreiro com a pontuacao
 		glScalef(.02,.02,.02);
 		glRotatef(180,0,1,0);
 		glLineWidth(2);
-		escreve("Precione R");
+		escreve("Pressione R");
 		glPopMatrix();
 
 	}
