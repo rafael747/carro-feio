@@ -23,9 +23,9 @@ int limiteEsq=-35, limiteDir=35;	//define os limites e o centro da pista em X
 float centro;
 
 float passo=0;		//distancia percorrida em cada tick (velocidade inicial do jogo)
-float incremento=0.0001;	//valor incrementado em passo a cada tick
+float incremento=0.01;	//valor incrementado em passo a cada tick
 //float incremento=0.0000001;	//valor incrementado em passo a cada tick
-float limite=20;			//limite de velocidade para o jogo
+float limite=18;			//limite de velocidade para o jogo
 
 int r1=232, g1=23, b1=56; //cor inicial do carro1
 int r2=100, g2=50, b2=100; //cor inicial do carro2
@@ -889,7 +889,7 @@ void Display()
 //os outros elementos tomam esse "passo" como metrica para seus movimentos
 	
 	if(ativo) { //verifica se o jogo esta ativo
-		score+=incremento; //pontuacao
+		score+=incremento/100; //pontuacao
 		if(passo < limite ) 
 			passo+=incremento;
 	}
@@ -944,6 +944,8 @@ void Display()
 /////////// Controle dos Carros (cor, velocidade, colisao, etc) ///////
 
 	carControl();
+
+	//printf("%.2f\n",passo);
 
 
 	glutSwapBuffers(); //Executa a Cena. SwapBuffers dá suporte para mais de um buffer, permitindo execução de animações sem cintilações. 
